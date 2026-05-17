@@ -1,2 +1,243 @@
 # paulcoffeeshop.github.io
 paul coffee shop website
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paul Coffee Shop - Premium Coffee & Pastries</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-coffee"></i> Paul Coffee Shop
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#menu" class="nav-link">Menu</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="#whatsapp" class="nav-link nav-cta">Order Now</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Paul Coffee Shop</h1>
+            <p>Savor the Finest Coffee & Pastries</p>
+            <a href="#whatsapp" class="btn btn-primary">Order via WhatsApp</a>
+        </div>
+    </section>
+
+    <!-- WhatsApp Welcome Section -->
+    <section id="whatsapp" class="whatsapp-section">
+        <div class="whatsapp-container">
+            <div class="whatsapp-icon">
+                <i class="fab fa-whatsapp"></i>
+            </div>
+            <h2>Let's Connect!</h2>
+            <p class="whatsapp-welcome">👋 Welcome to Paul Coffee Shop!</p>
+            <p class="whatsapp-message">We're delighted to serve you! Simply click the button below to send us a message on WhatsApp, and our friendly team will help you place your order. We serve the finest coffee, pastries, and beverages crafted with love.</p>
+            <a href="https://wa.me/96598915665?text=Hello%20Paul%20Coffee%20Shop!%20I%20would%20like%20to%20place%20an%20order.%20Can%20you%20help%20me%20with%20your%20menu%20options?" target="_blank" class="btn btn-whatsapp">
+                <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+            </a>
+            <p class="whatsapp-number">Or reach us at: <strong>+965 9891 5665</strong></p>
+            <p class="response-time">⏱️ We typically respond within minutes!</p>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="menu">
+        <h2>Our Menu</h2>
+        <div class="menu-grid">
+            <!-- Hot Drinks -->
+            <div class="menu-category">
+                <h3><i class="fas fa-mug-hot"></i> Hot Drinks</h3>
+                <div class="menu-items">
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Espresso</h4>
+                            <span class="price">2.50 KD</span>
+                        </div>
+                        <p>Rich, bold, and full-bodied</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Cappuccino</h4>
+                            <span class="price">3.50 KD</span>
+                        </div>
+                        <p>Smooth espresso with creamy foam</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Latte</h4>
+                            <span class="price">3.75 KD</span>
+                        </div>
+                        <p>Silky milk with a hint of espresso</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Mocha</h4>
+                            <span class="price">4.00 KD</span>
+                        </div>
+                        <p>Delightful blend of coffee and chocolate</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cold Drinks -->
+            <div class="menu-category">
+                <h3><i class="fas fa-snowflake"></i> Cold Drinks</h3>
+                <div class="menu-items">
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Iced Coffee</h4>
+                            <span class="price">3.25 KD</span>
+                        </div>
+                        <p>Refreshing cold brew perfection</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Iced Latte</h4>
+                            <span class="price">3.75 KD</span>
+                        </div>
+                        <p>Cool, creamy, and satisfying</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Iced Mocha</h4>
+                            <span class="price">4.25 KD</span>
+                        </div>
+                        <p>Chilled chocolate coffee bliss</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Cold Brew</h4>
+                            <span class="price">3.50 KD</span>
+                        </div>
+                        <p>Smooth, less acidic, extra smooth</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pastries & Snacks -->
+            <div class="menu-category">
+                <h3><i class="fas fa-croissant"></i> Pastries & Snacks</h3>
+                <div class="menu-items">
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Croissant</h4>
+                            <span class="price">2.00 KD</span>
+                        </div>
+                        <p>Buttery and flaky perfection</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Chocolate Croissant</h4>
+                            <span class="price">2.50 KD</span>
+                        </div>
+                        <p>Chocolate-filled morning delight</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Blueberry Muffin</h4>
+                            <span class="price">2.25 KD</span>
+                        </div>
+                        <p>Fresh and naturally sweet</p>
+                    </div>
+                    <div class="menu-item">
+                        <div class="item-header">
+                            <h4>Almond Biscotti</h4>
+                            <span class="price">1.75 KD</span>
+                        </div>
+                        <p>Perfect for dipping in your coffee</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="menu-cta">
+            <p>Ready to order? Contact us on WhatsApp!</p>
+            <a href="https://wa.me/96598915665?text=I%20would%20like%20to%20order%20from%20Paul%20Coffee%20Shop!" target="_blank" class="btn btn-primary">
+                <i class="fab fa-whatsapp"></i> Order Now
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="about-content">
+            <h2>About Paul Coffee Shop</h2>
+            <p>At Paul Coffee Shop, we're passionate about delivering the finest coffee experience. Every cup is crafted with premium beans sourced from around the world and prepared by our expert baristas.</p>
+            
+            <div class="stats">
+                <div class="stat">
+                    <h3>5+</h3>
+                    <p>Years of Excellence</p>
+                </div>
+                <div class="stat">
+                    <h3>1000+</h3>
+                    <p>Happy Customers</p>
+                </div>
+                <div class="stat">
+                    <h3>20+</h3>
+                    <p>Menu Items</p>
+                </div>
+                <div class="stat">
+                    <h3>100%</h3>
+                    <p>Satisfaction Guaranteed</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <h2>Get In Touch</h2>
+        <div class="contact-content">
+            <div class="contact-info">
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <h3>WhatsApp</h3>
+                    <p><a href="https://wa.me/96598915665" target="_blank">+965 9891 5665</a></p>
+                    <p class="small-text">Quick responses & easy ordering</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-clock"></i>
+                    <h3>Hours</h3>
+                    <p>Mon - Fri: 7:00 AM - 10:00 PM</p>
+                    <p>Sat - Sun: 8:00 AM - 11:00 PM</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Location</h3>
+                    <p>Paul Coffee Shop</p>
+                    <p>Kuwait</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Paul Coffee Shop. All rights reserved.</p>
+            <div class="social-links">
+                <a href="https://wa.me/96598915665" target="_blank"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
