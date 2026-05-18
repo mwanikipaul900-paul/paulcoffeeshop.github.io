@@ -1,71 +1,66 @@
 // ============================================================================
 // PAUL COFFEE SHOP - AUTOMATION SYSTEM
-// Features: Cart Management, Image Upload, WhatsApp Integration
-// ============================================================================
-
-// ============================================================================
-// 1. CART MANAGEMENT SYSTEM
+// Features: Cart Management, WhatsApp Integration, Online Payments
 // ============================================================================
 
 let cart = JSON.parse(localStorage.getItem('paulCoffeeCart')) || [];
 
-// Initialize cart on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeCart();
     setupEventListeners();
     syncCartWithUI();
+    handleWhatsAppWelcome();
+    setupPaymentControls();
+    trackPageView();
 });
 
-// Setup all event listeners
 function setupEventListeners() {
-    // Add to cart buttons
     document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
         btn.addEventListener('click', handleAddToCart);
     });
 
-    // Quantity adjustment buttons
     document.querySelectorAll('.btn-quantity').forEach(btn => {
         btn.addEventListener('click', handleQuantityAdjustment);
     });
 
-    // Quantity input fields
     document.querySelectorAll('.quantity-input').forEach(input => {
         input.addEventListener('change', handleQuantityInputChange);
     });
 
-    // Cart action buttons
-    document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
-    document.getElementById('send-order-btn').addEventListener('click', sendOrderToWhatsApp);
-    document.getElementById('checkout-btn').addEventListener('click', scrollToCart);
-    document.getElementById('gallery-checkout-btn').addEventListener('click', scrollToCart);
+    const clearBtn = document.getElementById('clear-cart-btn');
+    const whatsappBtn = document.getElementById('send-order-btn');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const galleryCheckoutBtn = document.getElementById('gallery-checkout-btn');
+    const payNowBtn = document.getElementById('pay-now-btn');
+    const paymentMethod = document.getElementById('payment-method');
+    const cartLink = document.querySelector('.cart-link');
 
-    // Hamburger menu
+    if (clearBtn) clearBtn.addEventListener('click', clearCart);
+    if (whatsappBtn) whatsappBtn.addEventListener('click', sendOrderToWhatsApp);
+    if (checkoutBtn) checkoutBtn.addEventListener('click', scrollToCart);
+    if (galleryCheckoutBtn) galleryCheckoutBtn.addEventListener('click', scrollToCart);
+    if (payNowBtn) payNowBtn.addEventListener('click', startOnlinePayment);
+    if (paymentMethod) paymentMethod.addEventListener('change', handlePaymentMethodChange);
+    if (cartLink) cartLink.addEventListener('click', scrollToCart);
+
     setupHamburgerMenu();
-
-    // WhatsApp integration for new visitors
-    handleWhatsAppWelcome();
 }
 
-// Initialize cart from localStorage
 function initializeCart() {
     cart = JSON.parse(localStorage.getItem('paulCoffeeCart')) || [];
 }
 
-// ============================================================================
-// ADD TO CART FUNCTIONALITY
-// ============================================================================
-
 function handleAddToCart(e) {
     const btn = e.target.closest('.btn-add-to-cart');
+    if (!btn) return;
+
     const itemId = btn.getAttribute('data-id');
     const itemName = btn.getAttribute('data-name');
     const itemPrice = parseFloat(btn.getAttribute('data-price'));
-    
-    // Get quantity from the quantity input if available
+
     const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
     const quantity = quantityInput ? parseInt(quantityInput.value) : 1;
 
-    // Check if item already exists in cart
     const existingItem = cart.find(item => item.id === itemId);
 
     if (existingItem) {
@@ -79,72 +74,51 @@ function handleAddToCart(e) {
         });
     }
 
-    // Save to localStorage
     saveCart();
     syncCartWithUI();
     showNotification(`✅ ${itemName} added to cart!`);
 
-    // Reset quantity input to 1
-    if (quantityInput) {
-        quantityInput.value = 1;
-    }
+    if (quantityInput) quantityInput.value = 1;
 }
-
-// ============================================================================
-// QUANTITY MANAGEMENT
-// ============================================================================
 
 function handleQuantityAdjustment(e) {
     const btn = e.target;
     const itemId = btn.getAttribute('data-id');
     const action = btn.getAttribute('data-action');
     const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
-
     if (!quantityInput) return;
 
     let currentValue = parseInt(quantityInput.value);
 
-    if (action === 'plus') {
-        currentValue++;
-    } else if (action === 'minus' && currentValue > 1) {
-        currentValue--;
-    }
+    if (action === 'plus') currentValue++;
+    if (action === 'minus' && currentValue > 1) currentValue--;
 
     quantityInput.value = currentValue;
 }
 
 function handleQuantityInputChange(e) {
     const input = e.target;
-    const itemId = input.getAttribute('data-id');
     let value = parseInt(input.value);
-
-    // Validate input
-    if (isNaN(value) || value < 1) {
-        input.value = 1;
-    }
+    if (isNaN(value) || value < 1) input.value = 1;
 }
-
-// ============================================================================
-// CART UI SYNCHRONIZATION
-// ============================================================================
 
 function syncCartWithUI() {
     updateCartCount();
     updateCartDisplay();
     updateOrderSummary();
+    updatePayButtonState();
 }
 
 function updateCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     const cartCountElement = document.querySelector('.cart-count');
-    if (cartCountElement) {
-        cartCountElement.textContent = totalItems;
-    }
+    if (cartCountElement) cartCountElement.textContent = totalItems;
 }
 
 function updateCartDisplay() {
     const cartItemsList = document.getElementById('cart-items-list');
-    
+    if (!cartItemsList) return;
+
     if (cart.length === 0) {
         cartItemsList.innerHTML = `
             <div class="empty-cart">
@@ -153,7 +127,10 @@ function updateCartDisplay() {
                 <a href="#menu" class="btn btn-primary">Continue Shopping</a>
             </div>
         `;
-        document.getElementById('send-order-btn').disabled = true;
+        const whatsappBtn = document.getElementById('send-order-btn');
+        const payNowBtn = document.getElementById('pay-now-btn');
+        if (whatsappBtn) whatsappBtn.disabled = true;
+        if (payNowBtn) payNowBtn.disabled = true;
         return;
     }
 
@@ -164,33 +141,40 @@ function updateCartDisplay() {
                 <p class="item-price">${item.price.toFixed(2)} KD</p>
             </div>
             <div class="cart-item-quantity">
-                <button class="cart-qty-btn" onclick="updateCartQuantity(${item.id}, -1)">-</button>
-                <input type="number" value="${item.quantity}" min="1" onchange="updateCartQuantity(${item.id}, this.value - ${item.quantity})">
-                <button class="cart-qty-btn" onclick="updateCartQuantity(${item.id}, 1)">+</button>
+                <button class="cart-qty-btn" onclick="updateCartQuantity('${item.id}', -1)">-</button>
+                <input type="number" value="${item.quantity}" min="1" onchange="updateCartQuantity('${item.id}', this.value - ${item.quantity})">
+                <button class="cart-qty-btn" onclick="updateCartQuantity('${item.id}', 1)">+</button>
             </div>
             <div class="cart-item-total">
                 <span>${(item.price * item.quantity).toFixed(2)} KD</span>
             </div>
-            <button class="btn-remove-item" onclick="removeFromCart(${item.id})">
+            <button class="btn-remove-item" onclick="removeFromCart('${item.id}')">
                 <i class="fas fa-trash"></i>
             </button>
         </div>
     `).join('');
 
-    document.getElementById('send-order-btn').disabled = false;
+    const whatsappBtn = document.getElementById('send-order-btn');
+    const payNowBtn = document.getElementById('pay-now-btn');
+    if (whatsappBtn) whatsappBtn.disabled = false;
+    if (payNowBtn) payNowBtn.disabled = false;
 }
 
 function updateOrderSummary() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-    document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' KD';
-    document.getElementById('total-items').textContent = totalItems;
-    document.getElementById('total-price').textContent = subtotal.toFixed(2) + ' KD';
+    const subtotalEl = document.getElementById('subtotal');
+    const totalItemsEl = document.getElementById('total-items');
+    const totalPriceEl = document.getElementById('total-price');
+
+    if (subtotalEl) subtotalEl.textContent = subtotal.toFixed(2) + ' KD';
+    if (totalItemsEl) totalItemsEl.textContent = totalItems;
+    if (totalPriceEl) totalPriceEl.textContent = subtotal.toFixed(2) + ' KD';
 }
 
 function updateCartQuantity(itemId, change) {
-    const item = cart.find(i => i.id === itemId);
+    const item = cart.find(i => i.id === String(itemId));
     if (item) {
         item.quantity = Math.max(1, item.quantity + parseInt(change));
         saveCart();
@@ -199,7 +183,7 @@ function updateCartQuantity(itemId, change) {
 }
 
 function removeFromCart(itemId) {
-    cart = cart.filter(item => item.id !== itemId);
+    cart = cart.filter(item => item.id !== String(itemId));
     saveCart();
     syncCartWithUI();
     showNotification('✅ Item removed from cart');
@@ -210,7 +194,7 @@ function clearCart() {
         showNotification('⚠️ Cart is already empty');
         return;
     }
-    
+
     if (confirm('Are you sure you want to clear your cart?')) {
         cart = [];
         saveCart();
@@ -223,41 +207,14 @@ function saveCart() {
     localStorage.setItem('paulCoffeeCart', JSON.stringify(cart));
 }
 
-// ============================================================================
-// 2. WHATSAPP INTEGRATION & INSTANT WELCOME MESSAGES
-// ============================================================================
-
-// Auto-send WhatsApp welcome message on first visit
 function handleWhatsAppWelcome() {
     const hasVisited = localStorage.getItem('paulCoffeeVisited');
-    
     if (!hasVisited) {
-        // Mark as visited
         localStorage.setItem('paulCoffeeVisited', 'true');
-        
-        // Show welcome notification after 2 seconds
         setTimeout(() => {
             showNotification('👋 Welcome to Paul Coffee Shop! Chat with us on WhatsApp for instant support!', 'info', 5000);
         }, 2000);
-
-        // Optional: Auto-trigger WhatsApp welcome (uncomment to enable)
-        // triggerWhatsAppWelcome();
     }
-}
-
-// Trigger WhatsApp welcome message
-function triggerWhatsAppWelcome() {
-    const welcomeMessage = encodeURIComponent(
-        '👋 Hello! I just discovered Paul Coffee Shop. Welcome to their store!\n\n' +
-        '🏪 Shop: Paul Coffee Shop\n' +
-        '⏰ Hours: 8am - 11pm\n' +
-        '☕ Quality Coffee & Pastries\n\n' +
-        'Tell me more about your menu & special offers!'
-    );
-    
-    const whatsappUrl = `https://wa.me/96598915665?text=${welcomeMessage}`;
-    // Uncomment line below to auto-open WhatsApp
-    // window.open(whatsappUrl, '_blank');
 }
 
 function sendOrderToWhatsApp() {
@@ -266,8 +223,7 @@ function sendOrderToWhatsApp() {
         return;
     }
 
-    // Build order message
-    const orderDetails = cart.map(item => 
+    const orderDetails = cart.map(item =>
         `• ${item.name} x${item.quantity} - ${(item.price * item.quantity).toFixed(2)} KD`
     ).join('\n');
 
@@ -284,27 +240,80 @@ function sendOrderToWhatsApp() {
     const whatsappUrl = `https://wa.me/96598915665?text=${message}`;
     window.open(whatsappUrl, '_blank');
 
-    // Clear cart after sending
     setTimeout(() => {
         showNotification('✅ Order sent! Our team will contact you shortly.', 'success', 4000);
     }, 500);
 }
 
-// ============================================================================
-// 3. IMAGE UPLOAD FUNCTIONALITY
-// ============================================================================
+function setupPaymentControls() {
+    const paymentMethod = document.getElementById('payment-method');
+    const mpesaGroup = document.getElementById('mpesa-phone-group');
+    if (!paymentMethod || !mpesaGroup) return;
+    mpesaGroup.style.display = paymentMethod.value === 'mpesa' ? 'block' : 'none';
+}
 
-// Initialize image upload system
+function handlePaymentMethodChange() {
+    const paymentMethod = document.getElementById('payment-method');
+    const mpesaGroup = document.getElementById('mpesa-phone-group');
+    if (!paymentMethod || !mpesaGroup) return;
+    mpesaGroup.style.display = paymentMethod.value === 'mpesa' ? 'block' : 'none';
+}
+
+function updatePayButtonState() {
+    const payNowBtn = document.getElementById('pay-now-btn');
+    if (payNowBtn) payNowBtn.disabled = cart.length === 0;
+}
+
+async function startOnlinePayment() {
+    if (cart.length === 0) {
+        showNotification('⚠️ Your cart is empty', 'warning');
+        return;
+    }
+
+    const paymentMethod = document.getElementById('payment-method');
+    const mpesaPhone = document.getElementById('mpesa-phone');
+    const method = paymentMethod ? paymentMethod.value : 'visa';
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    const payload = {
+        orderId: 'ORD-' + Date.now(),
+        amount: subtotal,
+        currency: 'KWD',
+        method: method,
+        items: cart,
+        mpesaPhone: mpesaPhone ? mpesaPhone.value : null
+    };
+
+    try {
+        showNotification('⏳ Preparing payment...', 'info', 2000);
+
+        const response = await fetch('/api/create-payment-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.paymentUrl) {
+            window.location.href = data.paymentUrl;
+        } else {
+            showNotification('❌ Payment could not be started', 'error', 4000);
+        }
+    } catch (error) {
+        console.error(error);
+        showNotification('❌ Network error while starting payment', 'error', 4000);
+    }
+}
+
 function initImageUpload() {
     const dropZones = document.querySelectorAll('[data-upload-zone]');
-    
+
     dropZones.forEach(zone => {
-        // Drag and drop events
         zone.addEventListener('dragover', handleDragOver);
         zone.addEventListener('dragleave', handleDragLeave);
         zone.addEventListener('drop', handleImageDrop);
 
-        // Click to upload
         const input = zone.querySelector('input[type="file"]');
         if (input) {
             input.addEventListener('change', handleFileInput);
@@ -325,7 +334,6 @@ function handleDragLeave(e) {
 function handleImageDrop(e) {
     e.preventDefault();
     e.currentTarget.classList.remove('drag-over');
-    
     const files = e.dataTransfer.files;
     handleImageFiles(files, e.currentTarget);
 }
@@ -338,19 +346,16 @@ function handleFileInput(e) {
 
 function handleImageFiles(files, zone) {
     Array.from(files).forEach(file => {
-        // Validate file type
         if (!file.type.startsWith('image/')) {
             showNotification('❌ Please upload image files only', 'error');
             return;
         }
 
-        // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
             showNotification('❌ Image size must be less than 5MB', 'error');
             return;
         }
 
-        // Read and display image
         const reader = new FileReader();
         reader.onload = (e) => {
             displayUploadedImage(e.target.result, file.name, zone);
@@ -363,7 +368,6 @@ function handleImageFiles(files, zone) {
 
 function displayUploadedImage(src, filename, zone) {
     const previewContainer = zone.querySelector('.image-preview') || createPreviewContainer(zone);
-    
     const imageElement = document.createElement('div');
     imageElement.className = 'uploaded-image';
     imageElement.innerHTML = `
@@ -374,7 +378,6 @@ function displayUploadedImage(src, filename, zone) {
             </button>
         </div>
     `;
-    
     previewContainer.appendChild(imageElement);
 }
 
@@ -417,39 +420,31 @@ function clearUploadedImages() {
     }
 }
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-// Toast notification system
 function showNotification(message, type = 'info', duration = 3000) {
     const toast = document.getElementById('toast-notification');
+    if (!toast) return;
     toast.textContent = message;
     toast.className = `toast-notification show ${type}`;
-
     setTimeout(() => {
         toast.classList.remove('show');
     }, duration);
 }
 
-// Scroll to cart section
 function scrollToCart() {
     const cartSection = document.getElementById('cart');
-    cartSection.scrollIntoView({ behavior: 'smooth' });
+    if (cartSection) cartSection.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Hamburger menu toggle
 function setupHamburgerMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
 
-    if (hamburger) {
+    if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => {
             navMenu.classList.toggle('active');
             hamburger.classList.toggle('active');
         });
 
-        // Close menu when link is clicked
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', () => {
                 navMenu.classList.remove('active');
@@ -459,11 +454,6 @@ function setupHamburgerMenu() {
     }
 }
 
-// ============================================================================
-// ADVANCED FEATURES - ANALYTICS & TRACKING
-// ============================================================================
-
-// Track page views
 function trackPageView() {
     const pageView = {
         page: window.location.pathname,
@@ -476,7 +466,6 @@ function trackPageView() {
     localStorage.setItem('paulCoffeePageViews', JSON.stringify(views));
 }
 
-// Track cart abandonment
 function trackCartAbandonment() {
     if (cart.length > 0) {
         const abandonment = {
@@ -491,7 +480,6 @@ function trackCartAbandonment() {
     }
 }
 
-// Log cart events
 function logCartEvent(eventName, eventData = {}) {
     const event = {
         name: eventName,
@@ -504,15 +492,8 @@ function logCartEvent(eventName, eventData = {}) {
     localStorage.setItem('paulCoffeeEvents', JSON.stringify(events));
 }
 
-// Initialize analytics
 window.addEventListener('beforeunload', trackCartAbandonment);
-document.addEventListener('DOMContentLoaded', trackPageView);
 
-// ============================================================================
-// EXPORT FUNCTIONS FOR CONSOLE USE
-// ============================================================================
-
-// Get cart analytics
 function getCartAnalytics() {
     return {
         currentCart: cart,
@@ -524,7 +505,6 @@ function getCartAnalytics() {
     };
 }
 
-// Clear all data (admin function)
 function clearAllData() {
     if (confirm('This will clear all stored data. Are you sure?')) {
         localStorage.clear();
@@ -533,12 +513,9 @@ function clearAllData() {
     }
 }
 
-// Console commands available:
-// getCartAnalytics() - View all analytics
-// clearAllData() - Clear all stored data
 console.log('%c✨ Paul Coffee Shop Automation Ready!', 'font-size: 16px; color: #8B4513; font-weight: bold;');
 console.log('%cAvailable Commands:', 'font-size: 12px; color: #555;');
 console.log('- getCartAnalytics() - View all stored data');
-console.log('- clearAllData() - Clear all data');
+console.log('- clearAllData() - Clear all stored data');
 console.log('- sendOrderToWhatsApp() - Send current cart to WhatsApp');
 console.log('- initImageUpload() - Initialize image upload system');
