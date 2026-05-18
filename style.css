@@ -189,7 +189,10 @@ body {
 .quantity-input,
 .cart-qty-input,
 .payment-select,
-#mpesa-phone {
+#mpesa-phone,
+#customer-name,
+#customer-email,
+#customer-phone {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 6px;
