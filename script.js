@@ -20,67 +20,22 @@ function setupGlobalEvents() {
         const removeBtn = e.target.closest('.btn-remove-item');
         const clearBtn = e.target.closest('#clear-cart-btn');
         const whatsappBtn = e.target.closest('#send-order-btn');
-        const checkoutBtn = e.target.closest('#checkout-btn');
-        const galleryCheckoutBtn = e.target.closest('#gallery-checkout-btn');
         const payNowBtn = e.target.closest('#pay-now-btn');
-        const cartLink = e.target.closest('.cart-link');
+        const checkoutBtn = e.target.closest('.cart-link');
 
-        if (addBtn) {
-            e.preventDefault();
-            handleAddToCart(addBtn);
-            return;
-        }
-
-        if (qtyBtn) {
-            e.preventDefault();
-            handleQuantityAdjustment(qtyBtn);
-            return;
-        }
-
-        if (cartQtyBtn) {
-            e.preventDefault();
-            handleCartQuantityButton(cartQtyBtn);
-            return;
-        }
-
-        if (removeBtn) {
-            e.preventDefault();
-            handleRemoveCartItem(removeBtn);
-            return;
-        }
-
-        if (clearBtn) {
-            e.preventDefault();
-            clearCart();
-            return;
-        }
-
-        if (whatsappBtn) {
-            e.preventDefault();
-            sendOrderToWhatsApp();
-            return;
-        }
-
-        if (checkoutBtn || galleryCheckoutBtn || cartLink) {
-            e.preventDefault();
-            scrollToCart();
-            return;
-        }
-
-        if (payNowBtn) {
-            e.preventDefault();
-            startOnlinePayment();
-            return;
-        }
+        if (addBtn) { e.preventDefault(); handleAddToCart(addBtn); return; }
+        if (qtyBtn) { e.preventDefault(); handleQuantityAdjustment(qtyBtn); return; }
+        if (cartQtyBtn) { e.preventDefault(); handleCartQuantityButton(cartQtyBtn); return; }
+        if (removeBtn) { e.preventDefault(); handleRemoveCartItem(removeBtn); return; }
+        if (clearBtn) { e.preventDefault(); clearCart(); return; }
+        if (whatsappBtn) { e.preventDefault(); sendOrderToWhatsApp(); return; }
+        if (payNowBtn) { e.preventDefault(); startOnlinePayment(); return; }
+        if (checkoutBtn) { e.preventDefault(); scrollToCart(); return; }
     });
 
     document.addEventListener('change', (e) => {
-        if (e.target.matches('.quantity-input')) {
-            handleQuantityInputChange(e.target);
-        }
-        if (e.target.matches('#payment-method')) {
-            handlePaymentMethodChange();
-        }
+        if (e.target.matches('.quantity-input')) handleQuantityInputChange(e.target);
+        if (e.target.matches('#payment-method')) setupPaymentControls();
         if (e.target.matches('#mpesa-phone')) {
             localStorage.setItem('paulCoffeeMpesaPhone', e.target.value || '');
         }
@@ -102,12 +57,7 @@ function handleAddToCart(btn) {
     if (existingItem) {
         existingItem.quantity += quantity;
     } else {
-        cart.push({
-            id: String(itemId),
-            name: itemName,
-            price: itemPrice,
-            quantity: quantity
-        });
+        cart.push({ id: String(itemId), name: itemName, price: itemPrice, quantity });
     }
 
     saveCart();
@@ -285,18 +235,23 @@ function setupPaymentControls() {
     paymentMethod.addEventListener('change', updateVisibility);
 }
 
-function handlePaymentMethodChange() {
-    setupPaymentControls();
-}
-
 async function startOnlinePayment() {
     if (cart.length === 0) {
         showNotification('⚠️ Your cart is empty', 'warning');
         return;
     }
 
+    const customerName = document.getElementById('customer-name')?.value.trim();
+    const customerEmail = document.getElementById('customer-email')?.value.trim();
+    const customerPhone = document.getElementById('customer-phone')?.value.trim();
     const paymentMethod = document.getElementById('payment-method');
     const mpesaPhone = document.getElementById('mpesa-phone');
+
+    if (!customerName || !customerEmail || !customerPhone) {
+        showNotification('⚠️ Please fill customer name, email, and phone', 'warning');
+        return;
+    }
+
     const method = paymentMethod ? paymentMethod.value : 'visa';
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -305,11 +260,18 @@ async function startOnlinePayment() {
         amount: subtotal,
         currency: 'KWD',
         method,
+        customer: {
+            name: customerName,
+            email: customerEmail,
+            phone: customerPhone
+        },
         items: cart,
         mpesaPhone: mpesaPhone ? mpesaPhone.value : '',
-        bankName: 'Co-operative Bank of Kenya',
-        bankAccount: '01234566678',
-        customerPhone: '+25494824443'
+        recipient: {
+            bankName: 'Co-operative Bank of Kenya',
+            bankAccount: '01234566678',
+            mpesaNumber: '+25494824443'
+        }
     };
 
     try {
@@ -325,6 +287,9 @@ async function startOnlinePayment() {
 
         if (data.success && data.paymentUrl) {
             window.location.href = data.paymentUrl;
+        } else if (data.success && data.message) {
+            showNotification(data.message, 'success', 5000);
+            sendThankYouWhatsApp(customerPhone, customerName, subtotal, method);
         } else {
             showNotification(data.message || '❌ Payment could not be started', 'error', 4000);
         }
@@ -332,6 +297,17 @@ async function startOnlinePayment() {
         console.error(error);
         showNotification('❌ Network error while starting payment', 'error', 4000);
     }
+}
+
+function sendThankYouWhatsApp(customerPhone, customerName, total, method) {
+    const message = encodeURIComponent(
+        `Thank you ${customerName} for ordering from Paul Coffee Shop.\n` +
+        `Your order total is ${total.toFixed(2)} KD.\n` +
+        `Payment method: ${method.toUpperCase()}.\n` +
+        `We appreciate your support.`
+    );
+
+    window.open(`https://wa.me/${customerPhone.replace(/\D/g, '')}?text=${message}`, '_blank');
 }
 
 function sendOrderToWhatsApp() {
@@ -345,26 +321,10 @@ function sendOrderToWhatsApp() {
     ).join('\n');
 
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const paymentMethod = document.getElementById('payment-method');
-    const method = paymentMethod ? paymentMethod.value : 'visa';
-
-    let paymentText = '';
-    if (method === 'mpesa') {
-        paymentText = `\nPayment Method: M-Pesa\nSend to: +25494824443`;
-    } else if (method === 'bank') {
-        paymentText = `\nPayment Method: Bank Transfer\nBank: Co-operative Bank of Kenya\nAccount No: 01234566678`;
-    } else if (method === 'knet') {
-        paymentText = `\nPayment Method: KNET`;
-    } else if (method === 'mastercard') {
-        paymentText = `\nPayment Method: Mastercard`;
-    } else {
-        paymentText = `\nPayment Method: Visa`;
-    }
-
     const message = encodeURIComponent(
         `🛒 *NEW ORDER FROM PAUL COFFEE SHOP*\n\n` +
         `📝 *Items Ordered:*\n${orderDetails}\n\n` +
-        `💰 *Total: ${subtotal.toFixed(2)} KD*${paymentText}\n\n` +
+        `💰 *Total: ${subtotal.toFixed(2)} KD*\n\n` +
         `🙏 Thank you for contacting us and ordering with Paul Coffee Shop. We appreciate your support and will process your order shortly.`
     );
 
