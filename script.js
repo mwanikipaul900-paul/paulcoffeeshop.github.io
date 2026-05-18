@@ -311,6 +311,44 @@ function sendOrderToWhatsApp() {
     );
 
     window.open(`https://wa.me/96598915665?text=${message}`, '_blank');
+<<<<<<< HEAD
+}
+
+function scrollToCart() {
+    const cartSection = document.getElementById('cart');
+    if (cartSection) cartSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+function handleWhatsAppWelcome() {
+    if (!localStorage.getItem('paulCoffeeVisited')) {
+        localStorage.setItem('paulCoffeeVisited', 'true');
+        setTimeout(() => showNotification('👋 Welcome to Paul Coffee Shop!', 'info', 5000), 1200);
+    }
+}
+
+function setupHamburgerMenu() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
+    }
+}
+
+function showNotification(message, type = 'info', duration = 3000) {
+    const toast = document.getElementById('toast-notification');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.className = `toast-notification show ${type}`;
+    setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+function trackPageView() {
+    const views = JSON.parse(localStorage.getItem('paulCoffeePageViews')) || [];
+    views.push({ page: window.location.pathname, timestamp: new Date().toISOString() });
+    localStorage.setItem('paulCoffeePageViews', JSON.stringify(views));
+=======
+>>>>>>> c78fa25 (let cart = JSON.parse(localStorage.getItem('paulCoffeeCart')) || [];)
 }
 
 function scrollToCart() {
