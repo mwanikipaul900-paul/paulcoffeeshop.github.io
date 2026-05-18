@@ -1,348 +1,300 @@
-let cart = JSON.parse(localStorage.getItem('paulCoffeeCart')) || [];
+require('dotenv').config();
 
-document.addEventListener('DOMContentLoaded', () => {
-    initializeApp();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+
+app.use(cors({
+    origin: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname)));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-function initializeApp() {
-    syncCartWithUI();
-    handleWhatsAppWelcome();
-    setupPaymentControls();
-    setupGlobalEvents();
-    trackPageView();
+app.get('/health', (req, res) => {
+    res.json({ success: true, message: 'Server is running' });
+});
+
+function normalizePhone(phone) {
+    return String(phone || '').replace(/[^\d]/g, '');
 }
 
-function setupGlobalEvents() {
-    document.addEventListener('click', (e) => {
-        const addBtn = e.target.closest('.btn-add-to-cart');
-        const qtyBtn = e.target.closest('.btn-quantity');
-        const cartQtyBtn = e.target.closest('.cart-qty-btn');
-        const removeBtn = e.target.closest('.btn-remove-item');
-        const clearBtn = e.target.closest('#clear-cart-btn');
-        const whatsappBtn = e.target.closest('#send-order-btn');
-        const payNowBtn = e.target.closest('#pay-now-btn');
-        const cartLink = e.target.closest('.cart-link');
-
-        if (addBtn) { e.preventDefault(); handleAddToCart(addBtn); return; }
-        if (qtyBtn) { e.preventDefault(); handleQuantityAdjustment(qtyBtn); return; }
-        if (cartQtyBtn) { e.preventDefault(); handleCartQuantityButton(cartQtyBtn); return; }
-        if (removeBtn) { e.preventDefault(); handleRemoveCartItem(removeBtn); return; }
-        if (clearBtn) { e.preventDefault(); clearCart(); return; }
-        if (whatsappBtn) { e.preventDefault(); sendOrderToWhatsApp(); return; }
-        if (payNowBtn) { e.preventDefault(); startOnlinePayment(); return; }
-        if (cartLink) { e.preventDefault(); scrollToCart(); return; }
-    });
-
-    document.addEventListener('change', (e) => {
-        if (e.target.matches('.quantity-input')) handleQuantityInputChange(e.target);
-        if (e.target.matches('#payment-method')) setupPaymentControls();
-        if (e.target.matches('#mpesa-phone')) localStorage.setItem('paulCoffeeMpesaPhone', e.target.value || '');
-    });
-
-    setupHamburgerMenu();
+function mpesaTimestamp() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
 }
 
-function handleAddToCart(btn) {
-    const itemId = btn.dataset.id;
-    const itemName = btn.dataset.name;
-    const itemPrice = parseFloat(btn.dataset.price);
+async function getMpesaAccessToken() {
+    const key = process.env.MPESA_CONSUMER_KEY;
+    const secret = process.env.MPESA_CONSUMER_SECRET;
 
-    if (!itemId || !itemName || Number.isNaN(itemPrice)) {
-        showNotification('❌ Product data is missing', 'error');
-        return;
+    if (!key || !secret) {
+        throw new Error('Missing M-Pesa consumer key or secret');
     }
 
-    const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
-    const quantity = quantityInput ? Math.max(1, parseInt(quantityInput.value) || 1) : 1;
+    const auth = Buffer.from(`${key}:${secret}`).toString('base64');
+    const baseUrl = process.env.MPESA_BASE_URL || 'https://sandbox.safaricom.co.ke';
 
-    const existingItem = cart.find(item => String(item.id) === String(itemId));
-    if (existingItem) existingItem.quantity += quantity;
-    else cart.push({ id: String(itemId), name: itemName, price: itemPrice, quantity });
+    const res = await fetch(`${baseUrl}/oauth/v1/generate?grant_type=client_credentials`, {
+        headers: { Authorization: `Basic ${auth}` }
+    });
 
-    saveCart();
-    syncCartWithUI();
-    showNotification(`✅ ${itemName} added to cart`, 'success');
-    if (quantityInput) quantityInput.value = 1;
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.errorMessage || 'Unable to get M-Pesa token');
+    return data.access_token;
 }
 
-function handleQuantityAdjustment(btn) {
-    const itemId = btn.dataset.id;
-    const action = btn.dataset.action;
-    const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
-    if (!quantityInput) return;
+async function initiateStkPush({ amount, phoneNumber, accountReference }) {
+    const shortcode = process.env.MPESA_SHORTCODE;
+    const passkey = process.env.MPESA_PASSKEY;
+    const callbackUrl = process.env.MPESA_CALLBACK_URL;
 
-    let value = parseInt(quantityInput.value) || 1;
-    if (action === 'plus') value++;
-    if (action === 'minus' && value > 1) value--;
-    quantityInput.value = value;
-}
-
-function handleQuantityInputChange(input) {
-    const value = parseInt(input.value);
-    if (isNaN(value) || value < 1) input.value = 1;
-}
-
-function handleCartQuantityButton(btn) {
-    const itemId = btn.dataset.id;
-    const action = btn.dataset.action;
-    const item = cart.find(i => String(i.id) === String(itemId));
-    if (!item) return;
-
-    if (action === 'plus') item.quantity++;
-    if (action === 'minus' && item.quantity > 1) item.quantity--;
-
-    saveCart();
-    syncCartWithUI();
-}
-
-function handleRemoveCartItem(btn) {
-    const itemId = btn.dataset.id;
-    cart = cart.filter(item => String(item.id) !== String(itemId));
-    saveCart();
-    syncCartWithUI();
-    showNotification('✅ Item removed from cart', 'success');
-}
-
-function syncCartWithUI() {
-    updateCartCount();
-    updateCartDisplay();
-    updateOrderSummary();
-    updatePayButtonState();
-    updateItemBadges();
-}
-
-function updateCartCount() {
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const cartCountElement = document.querySelector('.cart-count');
-    if (cartCountElement) cartCountElement.textContent = totalItems;
-}
-
-function updateCartDisplay() {
-    const cartItemsList = document.getElementById('cart-items-list');
-    const whatsappBtn = document.getElementById('send-order-btn');
-    const payNowBtn = document.getElementById('pay-now-btn');
-
-    if (!cartItemsList) return;
-
-    if (cart.length === 0) {
-        cartItemsList.innerHTML = `
-            <div class="empty-cart">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Your cart is empty</p>
-                <a href="#menu" class="btn btn-primary">Continue Shopping</a>
-            </div>
-        `;
-        if (whatsappBtn) whatsappBtn.disabled = true;
-        if (payNowBtn) payNowBtn.disabled = true;
-        return;
+    if (!shortcode || !passkey || !callbackUrl) {
+        throw new Error('Missing M-Pesa shortcode, passkey, or callback URL');
     }
 
-    cartItemsList.innerHTML = cart.map(item => `
-        <div class="cart-item" data-id="${item.id}">
-            <div class="cart-item-details">
-                <h4>${item.name}</h4>
-                <p class="item-price">${item.price.toFixed(2)} KES</p>
-            </div>
-            <div class="cart-item-quantity">
-                <button class="cart-qty-btn" data-id="${item.id}" data-action="minus">-</button>
-                <input type="number" class="cart-qty-input" value="${item.quantity}" min="1" data-id="${item.id}">
-                <button class="cart-qty-btn" data-id="${item.id}" data-action="plus">+</button>
-            </div>
-            <div class="cart-item-total">
-                <span>${(item.price * item.quantity).toFixed(2)} KES</span>
-            </div>
-            <button class="btn-remove-item" data-id="${item.id}">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    `).join('');
+    const token = await getMpesaAccessToken();
+    const baseUrl = process.env.MPESA_BASE_URL || 'https://sandbox.safaricom.co.ke';
+    const timestamp = mpesaTimestamp();
+    const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString('base64');
+    const phone = normalizePhone(phoneNumber);
 
-    if (whatsappBtn) whatsappBtn.disabled = false;
-    if (payNowBtn) payNowBtn.disabled = false;
-}
-
-function updateOrderSummary() {
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-    const subtotalEl = document.getElementById('subtotal');
-    const totalItemsEl = document.getElementById('total-items');
-    const totalPriceEl = document.getElementById('total-price');
-
-    if (subtotalEl) subtotalEl.textContent = subtotal.toFixed(2) + ' KES';
-    if (totalItemsEl) totalItemsEl.textContent = totalItems;
-    if (totalPriceEl) totalPriceEl.textContent = subtotal.toFixed(2) + ' KES';
-}
-
-function updatePayButtonState() {
-    const payNowBtn = document.getElementById('pay-now-btn');
-    if (payNowBtn) payNowBtn.disabled = cart.length === 0;
-}
-
-function updateItemBadges() {
-    document.querySelectorAll('.menu-item, .gallery-item').forEach(el => {
-        const id = el.getAttribute('data-id');
-        const item = cart.find(i => String(i.id) === String(id));
-
-        let badge = el.querySelector('.added-badge');
-        if (!badge) {
-            badge = document.createElement('div');
-            badge.className = 'added-badge';
-            el.style.position = 'relative';
-            el.appendChild(badge);
-        }
-
-        if (item) {
-            badge.textContent = `In Cart: ${item.quantity}`;
-            badge.style.display = 'block';
-        } else {
-            badge.style.display = 'none';
-        }
-    });
-}
-
-function saveCart() {
-    localStorage.setItem('paulCoffeeCart', JSON.stringify(cart));
-}
-
-function clearCart() {
-    cart = [];
-    saveCart();
-    syncCartWithUI();
-    showNotification('✅ Cart cleared', 'success');
-}
-
-function setupPaymentControls() {
-    const paymentMethod = document.getElementById('payment-method');
-    const mpesaGroup = document.getElementById('mpesa-phone-group');
-    const bankGroup = document.getElementById('bank-details-group');
-    const mpesaPhone = document.getElementById('mpesa-phone');
-    const storedPhone = localStorage.getItem('paulCoffeeMpesaPhone');
-
-    if (mpesaPhone && storedPhone) mpesaPhone.value = storedPhone;
-    if (!paymentMethod) return;
-
-    const updateVisibility = () => {
-        if (mpesaGroup) mpesaGroup.style.display = paymentMethod.value === 'mpesa' ? 'block' : 'none';
-        if (bankGroup) bankGroup.style.display = paymentMethod.value === 'bank' ? 'block' : 'none';
+    const body = {
+        BusinessShortCode: shortcode,
+        Password: password,
+        Timestamp: timestamp,
+        TransactionType: 'CustomerPayBillOnline',
+        Amount: Math.round(Number(amount)),
+        PartyA: phone,
+        PartyB: shortcode,
+        PhoneNumber: phone,
+        CallBackURL: callbackUrl,
+        AccountReference: accountReference,
+        TransactionDesc: 'Paul Mwaniki Coffee Shop payment'
     };
 
-    updateVisibility();
-    paymentMethod.addEventListener('change', updateVisibility);
+    const res = await fetch(`${baseUrl}/mpesa/stkpush/v1/processrequest`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.errorMessage || 'STK push failed');
+    return data;
 }
 
-async function startOnlinePayment() {
-    if (cart.length === 0) {
-        showNotification('⚠️ Your cart is empty', 'warning');
-        return;
-    }
-
-    const customerName = document.getElementById('customer-name')?.value.trim();
-    const customerEmail = document.getElementById('customer-email')?.value.trim();
-    const customerPhone = document.getElementById('customer-phone')?.value.trim();
-    const paymentMethod = document.getElementById('payment-method');
-    const mpesaPhone = document.getElementById('mpesa-phone');
-
-    if (!customerName || !customerEmail || !customerPhone) {
-        showNotification('⚠️ Please fill customer name, email, and phone', 'warning');
-        return;
-    }
-
-    const method = paymentMethod ? paymentMethod.value : 'visa';
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-    const payload = {
-        orderId: 'ORD-' + Date.now(),
-        amount: subtotal,
-        currency: 'KES',
-        method,
-        customer: { name: customerName, email: customerEmail, phone: customerPhone },
-        items: cart,
-        mpesaPhone: mpesaPhone ? mpesaPhone.value : ''
-    };
-
+app.post('/api/create-payment-link', async (req, res) => {
     try {
-        showNotification('⏳ Preparing payment...', 'info', 2000);
+        const { orderId, amount, customer, method, items, mpesaPhone } = req.body;
+        const paymentMethod = (method || 'visa').toLowerCase();
+        const currency = 'KES';
 
-        const response = await fetch('/api/create-payment-link', {
+        if (!orderId || !amount || !customer?.name || !customer?.email || !customer?.phone) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing order, amount, or customer details'
+            });
+        }
+
+        if (paymentMethod === 'bank') {
+            return res.json({
+                success: true,
+                paymentMode: 'bank',
+                currency,
+                orderId,
+                amount,
+                paymentUrl: null,
+                bankDetails: {
+                    bankName: 'Co-operative Bank of Kenya',
+                    accountName: 'Paul Mwaniki Coffee Shop',
+                    accountNumber: '01234566678',
+                    branch: 'Nairobi'
+                },
+                message: 'Bank transfer details provided'
+            });
+        }
+
+        if (paymentMethod === 'mpesa') {
+            const phone = normalizePhone(mpesaPhone || customer.phone);
+
+            if (!phone) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Missing M-Pesa phone number'
+                });
+            }
+
+            const stk = await initiateStkPush({
+                amount,
+                phoneNumber: phone,
+                accountReference: orderId
+            });
+
+            return res.json({
+                success: true,
+                paymentMode: 'mpesa',
+                currency,
+                orderId,
+                amount,
+                paymentUrl: null,
+                stkResponse: stk,
+                message: 'M-Pesa STK push sent to customer phone'
+            });
+        }
+
+        const sourceMap = {
+            visa: 'src_card',
+            mastercard: 'src_card',
+            knet: 'src_kw.knet'
+        };
+
+        const sourceId = sourceMap[paymentMethod] || 'src_card';
+        const gatewayKey = process.env.TAP_SECRET_KEY;
+
+        if (!gatewayKey) {
+            return res.status(500).json({
+                success: false,
+                message: 'TAP_SECRET_KEY is missing from server environment'
+            });
+        }
+
+        const tapPayload = {
+            amount: Number(amount).toFixed(3),
+            currency: 'KWD',
+            threeDSecure: true,
+            save_card: false,
+            description: `Paul Mwaniki Coffee Shop Order ${orderId}`,
+            statement_descriptor: 'PAUL MWANIKI',
+            customer: {
+                first_name: customer.name.split(' ')[0] || customer.name,
+                last_name: customer.name.split(' ').slice(1).join(' ') || 'Customer',
+                email: customer.email,
+                phone: {
+                    country_code: normalizePhone(customer.phone).startsWith('254') ? '254' : '965',
+                    number: normalizePhone(customer.phone)
+                }
+            },
+            source: {
+                id: sourceId
+            },
+            redirect: {
+                url: `${BASE_URL}/payment-success?orderId=${encodeURIComponent(orderId)}`
+            },
+            post: {
+                url: `${BASE_URL}/api/tap-webhook`
+            },
+            reference: {
+                transaction: orderId,
+                order: orderId
+            },
+            metadata: {
+                orderId,
+                items: JSON.stringify(items || [])
+            }
+        };
+
+        const tapResponse = await fetch('https://api.tap.company/v2/charges', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${gatewayKey}`
+            },
+            body: JSON.stringify(tapPayload)
         });
 
-        const data = await response.json();
+        const tapData = await tapResponse.json();
 
-        if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
-
-        if (data.paymentUrl) {
-            window.location.href = data.paymentUrl;
-            return;
+        if (!tapResponse.ok) {
+            return res.status(500).json({
+                success: false,
+                message: tapData?.message || 'Tap payment creation failed',
+                details: tapData
+            });
         }
 
-        if (data.paymentMode === 'bank' && data.bankDetails) {
-            showNotification('🏦 Bank details loaded in checkout.', 'success', 5000);
-            return;
+        const paymentUrl = tapData?.transaction?.url || tapData?.url || tapData?.redirect?.url || null;
+
+        if (!paymentUrl) {
+            return res.status(500).json({
+                success: false,
+                message: 'Tap did not return a payment URL',
+                details: tapData
+            });
         }
 
-        if (data.paymentMode === 'mpesa') {
-            showNotification('📲 M-Pesa payment request prepared.', 'success', 5000);
-            return;
-        }
+        return res.json({
+            success: true,
+            paymentMode: paymentMethod,
+            currency,
+            orderId,
+            amount,
+            paymentUrl,
+            tapResponse: tapData,
+            message: 'Tap payment link created successfully'
+        });
 
-        throw new Error('No payment URL returned');
     } catch (error) {
         console.error('Payment error:', error);
-        showNotification('❌ Payment server not ready or wrong URL.', 'error', 6000);
+        return res.status(500).json({
+            success: false,
+            message: 'Payment server error',
+            error: error.message
+        });
     }
-}
+});
 
-function sendOrderToWhatsApp() {
-    if (cart.length === 0) {
-        showNotification('⚠️ Your cart is empty', 'warning');
-        return;
-    }
+app.post('/api/tap-webhook', (req, res) => {
+    console.log('Tap webhook:', req.body);
+    res.status(200).json({ success: true });
+});
 
-    const orderDetails = cart.map(item => `• ${item.name} x${item.quantity} - ${(item.price * item.quantity).toFixed(2)} KES`).join('\n');
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+app.post('/api/mpesa-callback', (req, res) => {
+    console.log('M-Pesa callback:', JSON.stringify(req.body, null, 2));
+    res.status(200).json({ ResultCode: 0, ResultDesc: 'Accepted' });
+});
 
-    const message = encodeURIComponent(
-        `🛒 *NEW ORDER FROM PAUL COFFEE SHOP*\n\n` +
-        `📝 *Items Ordered:*\n${orderDetails}\n\n` +
-        `💰 *Total: ${subtotal.toFixed(2)} KES*\n\n` +
-        `🙏 Thank you for your order.`
-    );
+app.get('/payment-success', (req, res) => {
+    const orderId = req.query.orderId || 'Unknown';
 
-    window.open(`https://wa.me/96598915665?text=${message}`, '_blank');
-}
+    res.send(`
+        <html>
+        <head>
+            <title>Payment Success</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 60px; background: #f7f7f7; }
+                .box { max-width: 600px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 18px rgba(0,0,0,0.1); }
+                h1 { color: #27ae60; }
+                p { font-size: 18px; }
+                a { display: inline-block; margin-top: 20px; text-decoration: none; background: #7b5a4a; color: white; padding: 12px 20px; border-radius: 8px; }
+            </style>
+        </head>
+        <body>
+            <div class="box">
+                <h1>Payment Received</h1>
+                <p>Your order <strong>${orderId}</strong> has been processed successfully.</p>
+                <a href="/">Back to Shop</a>
+            </div>
+        </body>
+        </html>
+    `);
+});
 
-function scrollToCart() {
-    const cartSection = document.getElementById('cart');
-    if (cartSection) cartSection.scrollIntoView({ behavior: 'smooth' });
-}
-
-function handleWhatsAppWelcome() {
-    if (!localStorage.getItem('paulCoffeeVisited')) {
-        localStorage.setItem('paulCoffeeVisited', 'true');
-        setTimeout(() => showNotification('👋 Welcome to Paul Coffee Shop!', 'info', 5000), 1200);
-    }
-}
-
-function setupHamburgerMenu() {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-    if (hamburger && navMenu) hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
-}
-
-function showNotification(message, type = 'info', duration = 3000) {
-    const toast = document.getElementById('toast-notification');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.className = `toast-notification show ${type}`;
-    setTimeout(() => toast.classList.remove('show'), duration);
-}
-
-function trackPageView() {
-    const views = JSON.parse(localStorage.getItem('paulCoffeePageViews')) || [];
-    views.push({ page: window.location.pathname, timestamp: new Date().toISOString() });
-    localStorage.setItem('paulCoffeePageViews', JSON.stringify(views));
-}
+app.listen(PORT, () => {
+    console.log(`Server running on ${BASE_URL}`);
+});
