@@ -19,7 +19,11 @@
                 <li><a href="#gallery" class="nav-link">Gallery</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
-                <li><a href="#cart" class="nav-link nav-cta cart-link"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a></li>
+                <li>
+                    <a href="#cart" class="nav-link nav-cta cart-link">
+                        <i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span>
+                    </a>
+                </li>
             </ul>
             <div class="hamburger">
                 <span></span>
@@ -44,8 +48,10 @@
             </div>
             <h2>Let's Connect!</h2>
             <p class="whatsapp-welcome">👋 Welcome to Paul Coffee Shop!</p>
-            <p class="whatsapp-message">We're delighted to serve you! Simply click the button below to send us a message on WhatsApp, and our friendly team will help you place your order. We serve the finest coffee and pastries in Kuwait!</p>
-            <a href="https://wa.me/96598915665?text=Hello%20Paul%20Coffee%20Shop!%20I%20would%20like%20to%20place%20an%20order.%20Can%20you%20help%20me%20with%20your%20menu%20options?" target="_blank" class="btn btn-primary">
+            <p class="whatsapp-message">
+                We're delighted to serve you! Simply click the button below to send us a message on WhatsApp, and our friendly team will help you place your order. We serve the finest coffee and pastries in Kuwait!
+            </p>
+            <a href="https://wa.me/96598915665?text=Hello%20Paul%20Coffee%20Shop!%20I%20would%20like%20to%20place%20an%20order.%20Can%20you%20help%20me%20with%20your%20menu%20options?" target="_blank" class="btn btn-whatsapp">
                 <i class="fab fa-whatsapp"></i> Chat on WhatsApp
             </a>
             <p class="whatsapp-number">Or reach us at: <strong>+965 9891 5665</strong></p>
@@ -55,12 +61,12 @@
 
     <section id="menu" class="menu">
         <h2>Our Menu</h2>
+
         <div class="menu-grid">
             <div class="menu-category">
                 <h3><i class="fas fa-mug-hot"></i> Hot Drinks</h3>
                 <div class="menu-items">
                     <div class="menu-item" data-id="1" data-name="Espresso" data-price="2.50">
-                        <div class="item-image"><i class="fas fa-coffee"></i></div>
                         <div class="item-header">
                             <h4>Espresso</h4>
                             <span class="price">2.50 KD</span>
@@ -70,12 +76,11 @@
                             <button class="btn-quantity" data-id="1" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="1" value="1" min="1">
                             <button class="btn-quantity" data-id="1" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="1" data-name="Espresso" data-price="2.50"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="1" data-name="Espresso" data-price="2.50">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="2" data-name="Cappuccino" data-price="3.50">
-                        <div class="item-image"><i class="fas fa-mug-hot"></i></div>
                         <div class="item-header">
                             <h4>Cappuccino</h4>
                             <span class="price">3.50 KD</span>
@@ -85,12 +90,11 @@
                             <button class="btn-quantity" data-id="2" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="2" value="1" min="1">
                             <button class="btn-quantity" data-id="2" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="2" data-name="Cappuccino" data-price="3.50"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="2" data-name="Cappuccino" data-price="3.50">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="3" data-name="Latte" data-price="3.75">
-                        <div class="item-image"><i class="fas fa-leaf"></i></div>
                         <div class="item-header">
                             <h4>Latte</h4>
                             <span class="price">3.75 KD</span>
@@ -100,12 +104,11 @@
                             <button class="btn-quantity" data-id="3" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="3" value="1" min="1">
                             <button class="btn-quantity" data-id="3" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="3" data-name="Latte" data-price="3.75"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="3" data-name="Latte" data-price="3.75">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="4" data-name="Mocha" data-price="4.00">
-                        <div class="item-image"><i class="fas fa-heart"></i></div>
                         <div class="item-header">
                             <h4>Mocha</h4>
                             <span class="price">4.00 KD</span>
@@ -115,7 +118,7 @@
                             <button class="btn-quantity" data-id="4" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="4" value="1" min="1">
                             <button class="btn-quantity" data-id="4" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="4" data-name="Mocha" data-price="4.00"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="4" data-name="Mocha" data-price="4.00">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -125,7 +128,6 @@
                 <h3><i class="fas fa-snowflake"></i> Cold Drinks</h3>
                 <div class="menu-items">
                     <div class="menu-item" data-id="5" data-name="Iced Coffee" data-price="3.25">
-                        <div class="item-image"><i class="fas fa-snowflake"></i></div>
                         <div class="item-header">
                             <h4>Iced Coffee</h4>
                             <span class="price">3.25 KD</span>
@@ -135,12 +137,11 @@
                             <button class="btn-quantity" data-id="5" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="5" value="1" min="1">
                             <button class="btn-quantity" data-id="5" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="5" data-name="Iced Coffee" data-price="3.25"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="5" data-name="Iced Coffee" data-price="3.25">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="6" data-name="Iced Latte" data-price="3.75">
-                        <div class="item-image"><i class="fas fa-ice-cream"></i></div>
                         <div class="item-header">
                             <h4>Iced Latte</h4>
                             <span class="price">3.75 KD</span>
@@ -150,12 +151,11 @@
                             <button class="btn-quantity" data-id="6" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="6" value="1" min="1">
                             <button class="btn-quantity" data-id="6" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="6" data-name="Iced Latte" data-price="3.75"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="6" data-name="Iced Latte" data-price="3.75">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="7" data-name="Iced Mocha" data-price="4.25">
-                        <div class="item-image"><i class="fas fa-snowflake"></i></div>
                         <div class="item-header">
                             <h4>Iced Mocha</h4>
                             <span class="price">4.25 KD</span>
@@ -165,12 +165,11 @@
                             <button class="btn-quantity" data-id="7" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="7" value="1" min="1">
                             <button class="btn-quantity" data-id="7" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="7" data-name="Iced Mocha" data-price="4.25"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="7" data-name="Iced Mocha" data-price="4.25">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="8" data-name="Cold Brew" data-price="3.50">
-                        <div class="item-image"><i class="fas fa-water"></i></div>
                         <div class="item-header">
                             <h4>Cold Brew</h4>
                             <span class="price">3.50 KD</span>
@@ -180,7 +179,7 @@
                             <button class="btn-quantity" data-id="8" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="8" value="1" min="1">
                             <button class="btn-quantity" data-id="8" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="8" data-name="Cold Brew" data-price="3.50"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="8" data-name="Cold Brew" data-price="3.50">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -190,7 +189,6 @@
                 <h3><i class="fas fa-croissant"></i> Pastries & Snacks</h3>
                 <div class="menu-items">
                     <div class="menu-item" data-id="9" data-name="Croissant" data-price="2.00">
-                        <div class="item-image"><i class="fas fa-croissant"></i></div>
                         <div class="item-header">
                             <h4>Croissant</h4>
                             <span class="price">2.00 KD</span>
@@ -200,12 +198,11 @@
                             <button class="btn-quantity" data-id="9" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="9" value="1" min="1">
                             <button class="btn-quantity" data-id="9" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="9" data-name="Croissant" data-price="2.00"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="9" data-name="Croissant" data-price="2.00">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="10" data-name="Chocolate Croissant" data-price="2.50">
-                        <div class="item-image"><i class="fas fa-candy"></i></div>
                         <div class="item-header">
                             <h4>Chocolate Croissant</h4>
                             <span class="price">2.50 KD</span>
@@ -215,12 +212,11 @@
                             <button class="btn-quantity" data-id="10" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="10" value="1" min="1">
                             <button class="btn-quantity" data-id="10" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="10" data-name="Chocolate Croissant" data-price="2.50"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="10" data-name="Chocolate Croissant" data-price="2.50">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="11" data-name="Blueberry Muffin" data-price="2.25">
-                        <div class="item-image"><i class="fas fa-cupcake"></i></div>
                         <div class="item-header">
                             <h4>Blueberry Muffin</h4>
                             <span class="price">2.25 KD</span>
@@ -230,12 +226,11 @@
                             <button class="btn-quantity" data-id="11" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="11" value="1" min="1">
                             <button class="btn-quantity" data-id="11" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="11" data-name="Blueberry Muffin" data-price="2.25"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="11" data-name="Blueberry Muffin" data-price="2.25">Add to Cart</button>
                         </div>
                     </div>
 
                     <div class="menu-item" data-id="12" data-name="Almond Biscotti" data-price="1.75">
-                        <div class="item-image"><i class="fas fa-cookie"></i></div>
                         <div class="item-header">
                             <h4>Almond Biscotti</h4>
                             <span class="price">1.75 KD</span>
@@ -245,7 +240,7 @@
                             <button class="btn-quantity" data-id="12" data-action="minus">-</button>
                             <input type="number" class="quantity-input" data-id="12" value="1" min="1">
                             <button class="btn-quantity" data-id="12" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="12" data-name="Almond Biscotti" data-price="1.75"><i class="fas fa-shopping-cart"></i> Add</button>
+                            <button class="btn-add-to-cart" data-id="12" data-name="Almond Biscotti" data-price="1.75">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -263,6 +258,7 @@
     <section id="gallery" class="gallery">
         <h2>Our Coffee Gallery</h2>
         <p class="gallery-subtitle">Discover the artistry and quality behind every cup</p>
+
         <div class="gallery-grid">
             <div class="gallery-item" data-id="3" data-name="Latte" data-price="3.75">
                 <div class="gallery-image-wrapper">
@@ -272,7 +268,7 @@
                             <h3>Latte Art</h3>
                             <p>Beautifully crafted espresso with silky milk foam</p>
                             <span class="price-badge">3.75 KD</span>
-                            <button class="btn-add-to-cart" data-id="3" data-name="Latte" data-price="3.75"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="btn-add-to-cart" data-id="3" data-name="Latte" data-price="3.75">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -286,7 +282,7 @@
                             <h3>Cappuccino</h3>
                             <p>Rich espresso with velvety steamed milk</p>
                             <span class="price-badge">3.50 KD</span>
-                            <button class="btn-add-to-cart" data-id="2" data-name="Cappuccino" data-price="3.50"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="btn-add-to-cart" data-id="2" data-name="Cappuccino" data-price="3.50">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -300,7 +296,7 @@
                             <h3>Iced Coffee</h3>
                             <p>Refreshing cold brew with ice and cream</p>
                             <span class="price-badge">3.25 KD</span>
-                            <button class="btn-add-to-cart" data-id="5" data-name="Iced Coffee" data-price="3.25"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="btn-add-to-cart" data-id="5" data-name="Iced Coffee" data-price="3.25">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -314,7 +310,7 @@
                             <h3>Mocha</h3>
                             <p>Perfect blend of coffee and rich chocolate</p>
                             <span class="price-badge">4.00 KD</span>
-                            <button class="btn-add-to-cart" data-id="4" data-name="Mocha" data-price="4.00"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="btn-add-to-cart" data-id="4" data-name="Mocha" data-price="4.00">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -328,7 +324,7 @@
                             <h3>Croissants</h3>
                             <p>Buttery, flaky pastries baked fresh daily</p>
                             <span class="price-badge">2.00 KD</span>
-                            <button class="btn-add-to-cart" data-id="9" data-name="Croissant" data-price="2.00"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="btn-add-to-cart" data-id="9" data-name="Croissant" data-price="2.00">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -342,7 +338,7 @@
                             <h3>Espresso</h3>
                             <p>Bold and intense single or double shot</p>
                             <span class="price-badge">2.50 KD</span>
-                            <button class="btn-add-to-cart" data-id="1" data-name="Espresso" data-price="2.50"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="btn-add-to-cart" data-id="1" data-name="Espresso" data-price="2.50">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -356,7 +352,7 @@
                             <h3>Muffins</h3>
                             <p>Delicious blueberry and chocolate varieties</p>
                             <span class="price-badge">2.25 KD</span>
-                            <button class="btn-add-to-cart" data-id="11" data-name="Blueberry Muffin" data-price="2.25"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="btn-add-to-cart" data-id="11" data-name="Blueberry Muffin" data-price="2.25">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -370,7 +366,7 @@
                             <h3>Premium Blend</h3>
                             <p>Our finest selection of specialty coffees</p>
                             <span class="price-badge">3.75 KD</span>
-                            <button class="btn-add-to-cart" data-id="3" data-name="Latte" data-price="3.75"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                            <button class="btn-add-to-cart" data-id="3" data-name="Latte" data-price="3.75">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -412,96 +408,4 @@
     </section>
 
     <section id="cart" class="cart-section">
-        <h2>Your Shopping Cart</h2>
-        <div class="cart-container">
-            <div id="cart-items-list" class="cart-items-list">
-                <div class="empty-cart">
-                    <i class="fas fa-shopping-cart"></i>
-                    <p>Your cart is empty</p>
-                    <a href="#menu" class="btn btn-primary">Continue Shopping</a>
-                </div>
-            </div>
-            <div class="cart-summary">
-                <h3>Order Summary</h3>
-                <div class="summary-item">
-                    <span>Subtotal:</span>
-                    <span id="subtotal">0.00 KD</span>
-                </div>
-                <div class="summary-item">
-                    <span>Total Items:</span>
-                    <span id="total-items">0</span>
-                </div>
-                <div class="summary-item total">
-                    <span>Total:</span>
-                    <span id="total-price">0.00 KD</span>
-                </div>
-
-                <div class="summary-item">
-                    <span>Payment Method:</span>
-                    <select id="payment-method" class="payment-select">
-                        <option value="visa">Visa / Card</option>
-                        <option value="knet">KNET</option>
-                        <option value="mpesa">M-Pesa</option>
-                    </select>
-                </div>
-
-                <div class="summary-item" id="mpesa-phone-group" style="display:none;">
-                    <span>M-Pesa Phone:</span>
-                    <input type="tel" id="mpesa-phone" placeholder="e.g. 254794824443">
-                </div>
-
-                <button id="pay-now-btn" class="btn btn-primary btn-full" enabled>
-                    <i class="fas fa-lock"></i> Pay Now
-                </button>
-
-                <button id="send-order-btn" class="btn btn-primary btn-full" enabled>
-                    <i class="fab fa-whatsapp"></i> Send Order to WhatsApp
-                </button>
-
-                <button id="clear-cart-btn" class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Clear Cart
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact" class="contact">
-        <h2>Get In Touch</h2>
-        <div class="contact-content">
-            <div class="contact-info">
-                <div class="info-item">
-                    <i class="fas fa-phone"></i>
-                    <h3>WhatsApp</h3>
-                    <p><a href="https://wa.me/96598915665" target="_blank">+965 9891 5665</a></p>
-                    <p class="small-text">Quick responses & easy ordering</p>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-clock"></i>
-                    <h3>Hours</h3>
-                    <p>Mon - Fri: 7:00 AM - 10:00 PM</p>
-                    <p>Sat - Sun: 8:00 AM - 11:00 PM</p>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <h3>Location</h3>
-                    <p>Paul Coffee Shop</p>
-                    <p>Kuwait</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div id="toast-notification" class="toast-notification"></div>
-
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2026 Paul Coffee Shop. All rights reserved.</p>
-            <div class="social-links">
-                <a href="https://wa.me/96598915665" target="_blank"><i class="fab fa-whatsapp"></i></a>
-            </div>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
-</body>
-</html>
+        
