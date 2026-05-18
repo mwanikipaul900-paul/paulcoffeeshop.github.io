@@ -286,10 +286,13 @@ async function startOnlinePayment() {
         }
 
         throw new Error(data.message || 'Payment could not be started');
-    } catch (error) {
-        console.error(error);
-        showNotification('❌ Payment server not ready or wrong API URL.', 'error', 6000);
-    }
+    catch (error) {
+    console.error('Payment error:', error);
+    showNotification(
+        'Payment server not ready, wrong URL, or CORS blocked the request.',
+        'error',
+        6000
+    );
 }
 
 function sendOrderToWhatsApp() {
