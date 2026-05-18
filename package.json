@@ -1,0 +1,26 @@
+{
+  "name": "paulcoffeeshop.github.io",
+  "version": "1.0.0",
+  "description": "<!DOCTYPE html> <html lang=\"en\"> <head>     <meta charset=\"UTF-8\">     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">     <title>Paul Coffee Shop</title>     <link rel=\"stylesheet\" href=\"style.css\">     <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\"> </head> <body>     <nav class=\"navbar\">         <div class=\"nav-container\">             <div class=\"nav-logo\">                 <i class=\"fas fa-coffee\"></i> Paul Coffee Shop             </div>             <ul class=\"nav-menu\">                 <li><a href=\"#home\" class=\"nav-link\">Home</a></li>                 <li><a href=\"#menu\" class=\"nav-link\">Menu</a></li>                 <li><a href=\"#gallery\" class=\"nav-link\">Gallery</a></li>                 <li><a href=\"#about\" class=\"nav-link\">About</a></li>                 <li><a href=\"#cart\" class=\"nav-link cart-link\">Cart <span class=\"cart-count\">0</span></a></li>                 <li><a href=\"#contact\" class=\"nav-link nav-cta\">Contact</a></li>             </ul>             <div class=\"hamburger\">                 <span></span><span></span><span></span>             </div>         </div>     </nav>",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mwanikipaul900-paul/paulcoffeeshop.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mwanikipaul900-paul/paulcoffeeshop.github.io/issues"
+  },
+  "homepage": "https://github.com/mwanikipaul900-paul/paulcoffeeshop.github.io#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
