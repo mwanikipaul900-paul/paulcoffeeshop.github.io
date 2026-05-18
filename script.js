@@ -114,9 +114,11 @@ function updateCartCount() {
     const cartCountElement = document.querySelector('.cart-count');
     if (cartCountElement) cartCountElement.textContent = totalItems;
 }
-
 function updateCartDisplay() {
     const cartItemsList = document.getElementById('cart-items-list');
+    const whatsappBtn = document.getElementById('send-order-btn');
+    const payNowBtn = document.getElementById('pay-now-btn');
+
     if (!cartItemsList) return;
 
     if (cart.length === 0) {
@@ -127,12 +129,34 @@ function updateCartDisplay() {
                 <a href="#menu" class="btn btn-primary">Continue Shopping</a>
             </div>
         `;
-        const whatsappBtn = document.getElementById('send-order-btn');
-        const payNowBtn = document.getElementById('pay-now-btn');
         if (whatsappBtn) whatsappBtn.disabled = true;
         if (payNowBtn) payNowBtn.disabled = true;
         return;
     }
+
+    cartItemsList.innerHTML = cart.map(item => `
+        <div class="cart-item" data-id="${item.id}">
+            <div class="cart-item-details">
+                <h4>${item.name}</h4>
+                <p class="item-price">${item.price.toFixed(2)} KD</p>
+            </div>
+            <div class="cart-item-quantity">
+                <button class="cart-qty-btn" onclick="updateCartQuantity('${item.id}', -1)">-</button>
+                <input type="number" value="${item.quantity}" min="1" onchange="updateCartQuantity('${item.id}', this.value - ${item.quantity})">
+                <button class="cart-qty-btn" onclick="updateCartQuantity('${item.id}', 1)">+</button>
+            </div>
+            <div class="cart-item-total">
+                <span>${(item.price * item.quantity).toFixed(2)} KD</span>
+            </div>
+            <button class="btn-remove-item" onclick="removeFromCart('${item.id}')">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+
+    if (whatsappBtn) whatsappBtn.disabled = false;
+    if (payNowBtn) payNowBtn.disabled = false;
+ }
 
     cartItemsList.innerHTML = cart.map(item => `
         <div class="cart-item" data-id="${item.id}">
