@@ -17,4 +17,206 @@
                 <li><a href="#gallery" class="nav-link">Gallery</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="#cart" class="nav-link cart-link">Cart <span class="cart-count">0</span></a></li>
-                <li><a 
+                <li><a href="#contact" class="nav-link nav-cta">Contact</a></li>
+            </ul>
+            <div class="hamburger"><span></span><span></span><span></span></div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Paul Mwaniki Coffee Shop</h1>
+            <p>Fresh coffee, cakes, desserts, and quick payments.</p>
+            <a href="#menu" class="btn btn-primary">Order Now</a>
+        </div>
+    </section>
+
+    <section id="menu" class="menu">
+        <h2>Menu</h2>
+        <div class="menu-grid">
+            <div class="menu-category">
+                <h3><i class="fas fa-mug-hot"></i> Hot Coffee</h3>
+                <div class="menu-items">
+                    <div class="menu-item" data-id="1" data-name="Espresso" data-price="2.50">
+                        <div class="item-header"><h4>Espresso</h4><span class="price">2.50 KES</span></div>
+                        <p>Strong single shot.</p>
+                        <div class="item-controls">
+                            <button class="btn-quantity" data-id="1" data-action="minus">-</button>
+                            <input type="number" class="quantity-input" data-id="1" value="1" min="1">
+                            <button class="btn-quantity" data-id="1" data-action="plus">+</button>
+                            <button class="btn-add-to-cart" data-id="1" data-name="Espresso" data-price="2.50">Add to Cart</button>
+                        </div>
+                    </div>
+
+                    <div class="menu-item" data-id="2" data-name="Cappuccino" data-price="3.50">
+                        <div class="item-header"><h4>Cappuccino</h4><span class="price">3.50 KES</span></div>
+                        <p>Espresso, milk, and foam.</p>
+                        <div class="item-controls">
+                            <button class="btn-quantity" data-id="2" data-action="minus">-</button>
+                            <input type="number" class="quantity-input" data-id="2" value="1" min="1">
+                            <button class="btn-quantity" data-id="2" data-action="plus">+</button>
+                            <button class="btn-add-to-cart" data-id="2" data-name="Cappuccino" data-price="3.50">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3><i class="fas fa-snowflake"></i> Iced Coffee</h3>
+                <div class="menu-items">
+                    <div class="menu-item" data-id="3" data-name="Iced Coffee" data-price="3.25">
+                        <div class="item-header"><h4>Iced Coffee</h4><span class="price">3.25 KES</span></div>
+                        <p>Chilled and refreshing.</p>
+                        <div class="item-controls">
+                            <button class="btn-quantity" data-id="3" data-action="minus">-</button>
+                            <input type="number" class="quantity-input" data-id="3" value="1" min="1">
+                            <button class="btn-quantity" data-id="3" data-action="plus">+</button>
+                            <button class="btn-add-to-cart" data-id="3" data-name="Iced Coffee" data-price="3.25">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3><i class="fas fa-birthday-cake"></i> Cakes</h3>
+                <div class="menu-items">
+                    <div class="menu-item" data-id="4" data-name="Chocolate Cake Slice" data-price="2.75">
+                        <div class="item-header"><h4>Chocolate Cake Slice</h4><span class="price">2.75 KES</span></div>
+                        <p>Moist chocolate sponge.</p>
+                        <div class="item-controls">
+                            <button class="btn-quantity" data-id="4" data-action="minus">-</button>
+                            <input type="number" class="quantity-input" data-id="4" value="1" min="1">
+                            <button class="btn-quantity" data-id="4" data-action="plus">+</button>
+                            <button class="btn-add-to-cart" data-id="4" data-name="Chocolate Cake Slice" data-price="2.75">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-category">
+                <h3><i class="fas fa-ice-cream"></i> Desserts</h3>
+                <div class="menu-items">
+                    <div class="menu-item" data-id="5" data-name="Cheesecake" data-price="3.00">
+                        <div class="item-header"><h4>Cheesecake</h4><span class="price">3.00 KES</span></div>
+                        <p>Creamy and smooth.</p>
+                        <div class="item-controls">
+                            <button class="btn-quantity" data-id="5" data-action="minus">-</button>
+                            <input type="number" class="quantity-input" data-id="5" value="1" min="1">
+                            <button class="btn-quantity" data-id="5" data-action="plus">+</button>
+                            <button class="btn-add-to-cart" data-id="5" data-name="Cheesecake" data-price="3.00">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" class="gallery">
+        <h2>Gallery</h2>
+        <p class="gallery-subtitle">Selected favorites from our shop.</p>
+        <div class="gallery-grid">
+            <div class="gallery-item" data-id="2" data-name="Cappuccino" data-price="3.50">
+                <div class="gallery-image-wrapper">
+                    <i class="fas fa-coffee gallery-icon"></i>
+                    <div class="gallery-overlay">
+                        <div class="overlay-content">
+                            <h3>Cappuccino</h3>
+                            <p>Foamy and rich.</p>
+                            <span class="price-badge">3.50 KES</span>
+                            <button class="btn-add-to-cart" data-id="2" data-name="Cappuccino" data-price="3.50">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="about-content">
+            <h2>About Us</h2>
+            <p>We serve coffee, cakes, and desserts with a simple ordering experience and flexible payment methods.</p>
+        </div>
+    </section>
+
+    <section id="cart" class="cart-section">
+        <h2>Cart</h2>
+        <div class="cart-container">
+            <div id="cart-items-list" class="cart-items-list">
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Your cart is empty</p>
+                    <a href="#menu" class="btn btn-primary">Continue Shopping</a>
+                </div>
+            </div>
+
+            <div class="cart-summary">
+                <h3>Order Summary</h3>
+                <div class="summary-item">
+                    <span>Customer Name:</span>
+                    <input type="text" id="customer-name" placeholder="Your name">
+                </div>
+                <div class="summary-item">
+                    <span>Customer Email:</span>
+                    <input type="email" id="customer-email" placeholder="Your email">
+                </div>
+                <div class="summary-item">
+                    <span>Customer Phone:</span>
+                    <input type="tel" id="customer-phone" placeholder="Your phone">
+                </div>
+
+                <div class="summary-item">
+                    <span>Payment Method:</span>
+                    <select id="payment-method" class="payment-select">
+                        <option value="visa">Visa</option>
+                        <option value="mastercard">Mastercard</option>
+                        <option value="knet">KNET</option>
+                        <option value="mpesa">M-Pesa</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                </div>
+
+                <div class="summary-item" id="mpesa-phone-group" style="display:none;">
+                    <span>M-Pesa Phone:</span>
+                    <input type="tel" id="mpesa-phone" placeholder="e.g. 254712345678">
+                </div>
+
+                <div class="summary-item" id="bank-details-group" style="display:none;">
+                    <div class="bank-details">
+                        <p><strong>Bank:</strong> Co-operative Bank of Kenya</p>
+                        <p><strong>Account No:</strong> 01234566678</p>
+                    </div>
+                </div>
+
+                <div class="summary-item"><span>Subtotal:</span><span id="subtotal">0.00 KES</span></div>
+                <div class="summary-item"><span>Total Items:</span><span id="total-items">0</span></div>
+                <div class="summary-item total"><span>Total:</span><span id="total-price">0.00 KES</span></div>
+
+                <button id="pay-now-btn" class="btn btn-primary btn-full" disabled>
+                    <i class="fas fa-lock"></i> Pay Now
+                </button>
+                <button id="send-order-btn" class="btn btn-primary btn-full" disabled>
+                    <i class="fab fa-whatsapp"></i> Send Order to WhatsApp
+                </button>
+                <button id="clear-cart-btn" class="btn btn-danger btn-full">
+                    <i class="fas fa-trash"></i> Clear Cart
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Contact</h2>
+        <p>WhatsApp: +965 9891 5665</p>
+    </section>
+
+    <div id="toast-notification" class="toast-notification"></div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Paul Mwaniki Coffee Shop</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
