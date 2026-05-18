@@ -18,7 +18,7 @@
                 <li><a href="#menu" class="nav-link">Menu</a></li>
                 <li><a href="#gallery" class="nav-link">Gallery</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
-                <li><a href="#cart" class="nav-link">Cart <span class="cart-count">0</span></a></li>
+                <li><a href="#cart" class="nav-link cart-link">Cart <span class="cart-count">0</span></a></li>
                 <li><a href="#contact" class="nav-link nav-cta">Contact</a></li>
             </ul>
             <div class="hamburger">
@@ -67,37 +67,23 @@
                             <button class="btn-add-to-cart" data-id="1" data-name="Espresso" data-price="2.50">Add to Cart</button>
                         </div>
                     </div>
-
-                    <div class="menu-item" data-id="2" data-name="Cappuccino" data-price="3.50">
-                        <div class="item-header">
-                            <h4>Cappuccino</h4>
-                            <span class="price">3.50 KD</span>
-                        </div>
-                        <p>Classic coffee taste.</p>
-                        <div class="item-controls">
-                            <button class="btn-quantity" data-id="2" data-action="minus">-</button>
-                            <input type="number" class="quantity-input" data-id="2" value="1" min="1">
-                            <button class="btn-quantity" data-id="2" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="2" data-name="Cappuccino" data-price="3.50">Add to Cart</button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
             <div class="menu-category">
                 <h3><i class="fas fa-croissant"></i> Pastries</h3>
                 <div class="menu-items">
-                    <div class="menu-item" data-id="3" data-name="Croissant" data-price="2.00">
+                    <div class="menu-item" data-id="2" data-name="Croissant" data-price="2.00">
                         <div class="item-header">
                             <h4>Croissant</h4>
                             <span class="price">2.00 KD</span>
                         </div>
                         <p>Fresh and flaky.</p>
                         <div class="item-controls">
-                            <button class="btn-quantity" data-id="3" data-action="minus">-</button>
-                            <input type="number" class="quantity-input" data-id="3" value="1" min="1">
-                            <button class="btn-quantity" data-id="3" data-action="plus">+</button>
-                            <button class="btn-add-to-cart" data-id="3" data-name="Croissant" data-price="2.00">Add to Cart</button>
+                            <button class="btn-quantity" data-id="2" data-action="minus">-</button>
+                            <input type="number" class="quantity-input" data-id="2" value="1" min="1">
+                            <button class="btn-quantity" data-id="2" data-action="plus">+</button>
+                            <button class="btn-add-to-cart" data-id="2" data-name="Croissant" data-price="2.00">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -119,20 +105,6 @@
                             <p>Our signature shot.</p>
                             <span class="price-badge">2.50 KD</span>
                             <button class="btn-add-to-cart" data-id="1" data-name="Espresso" data-price="2.50">Add to Cart</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="gallery-item" data-id="2" data-name="Cappuccino" data-price="3.50">
-                <div class="gallery-image-wrapper">
-                    <i class="fas fa-mug-hot gallery-icon"></i>
-                    <div class="gallery-overlay">
-                        <div class="overlay-content">
-                            <h3>Cappuccino</h3>
-                            <p>Foamy and smooth.</p>
-                            <span class="price-badge">3.50 KD</span>
-                            <button class="btn-add-to-cart" data-id="2" data-name="Cappuccino" data-price="3.50">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -166,18 +138,18 @@
                 <h3>Order Summary</h3>
 
                 <div class="summary-item">
-                    <span>Subtotal:</span>
-                    <span id="subtotal">0.00 KD</span>
+                    <span>Customer Name:</span>
+                    <input type="text" id="customer-name" placeholder="Your name">
                 </div>
 
                 <div class="summary-item">
-                    <span>Total Items:</span>
-                    <span id="total-items">0</span>
+                    <span>Customer Email:</span>
+                    <input type="email" id="customer-email" placeholder="Your email">
                 </div>
 
-                <div class="summary-item total">
-                    <span>Total:</span>
-                    <span id="total-price">0.00 KD</span>
+                <div class="summary-item">
+                    <span>Customer Phone:</span>
+                    <input type="tel" id="customer-phone" placeholder="Your phone">
                 </div>
 
                 <div class="summary-item">
@@ -201,6 +173,21 @@
                         <p><strong>Bank:</strong> Co-operative Bank of Kenya</p>
                         <p><strong>Account No:</strong> 01234566678</p>
                     </div>
+                </div>
+
+                <div class="summary-item">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">0.00 KD</span>
+                </div>
+
+                <div class="summary-item">
+                    <span>Total Items:</span>
+                    <span id="total-items">0</span>
+                </div>
+
+                <div class="summary-item total">
+                    <span>Total:</span>
+                    <span id="total-price">0.00 KD</span>
                 </div>
 
                 <button id="pay-now-btn" class="btn btn-primary btn-full" disabled>
