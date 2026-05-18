@@ -46,6 +46,12 @@ function handleAddToCart(btn) {
     const itemId = btn.dataset.id;
     const itemName = btn.dataset.name;
     const itemPrice = parseFloat(btn.dataset.price);
+
+    if (!itemId || !itemName || Number.isNaN(itemPrice)) {
+        showNotification('❌ Product data is missing', 'error');
+        return;
+    }
+
     const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
     const quantity = quantityInput ? Math.max(1, parseInt(quantityInput.value) || 1) : 1;
 
@@ -55,7 +61,7 @@ function handleAddToCart(btn) {
 
     saveCart();
     syncCartWithUI();
-    showNotification(`✅ ${itemName} added to cart (${quantity})`, 'success');
+    showNotification(`✅ ${itemName} added to cart`, 'success');
     if (quantityInput) quantityInput.value = 1;
 }
 
@@ -266,9 +272,7 @@ async function startOnlinePayment() {
 
         const data = await response.json();
 
-        if (!response.ok) {
-            throw new Error(data.message || `HTTP ${response.status}`);
-        }
+        if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
 
         if (data.paymentUrl) {
             window.location.href = data.paymentUrl;
@@ -298,11 +302,9 @@ function sendOrderToWhatsApp() {
         return;
     }
 
-    const orderDetails = cart.map(item =>
-        `• ${item.name} x${item.quantity} - ${(item.price * item.quantity).toFixed(2)} KES`
-    ).join('\n');
-
+    const orderDetails = cart.map(item => `• ${item.name} x${item.quantity} - ${(item.price * item.quantity).toFixed(2)} KES`).join('\n');
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
     const message = encodeURIComponent(
         `🛒 *NEW ORDER FROM PAUL COFFEE SHOP*\n\n` +
         `📝 *Items Ordered:*\n${orderDetails}\n\n` +
@@ -311,7 +313,6 @@ function sendOrderToWhatsApp() {
     );
 
     window.open(`https://wa.me/96598915665?text=${message}`, '_blank');
-<<<<<<< HEAD
 }
 
 function scrollToCart() {
@@ -329,47 +330,7 @@ function handleWhatsAppWelcome() {
 function setupHamburgerMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
-
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
-    }
-}
-
-function showNotification(message, type = 'info', duration = 3000) {
-    const toast = document.getElementById('toast-notification');
-    if (!toast) return;
-    toast.textContent = message;
-    toast.className = `toast-notification show ${type}`;
-    setTimeout(() => toast.classList.remove('show'), duration);
-}
-
-function trackPageView() {
-    const views = JSON.parse(localStorage.getItem('paulCoffeePageViews')) || [];
-    views.push({ page: window.location.pathname, timestamp: new Date().toISOString() });
-    localStorage.setItem('paulCoffeePageViews', JSON.stringify(views));
-=======
->>>>>>> c78fa25 (let cart = JSON.parse(localStorage.getItem('paulCoffeeCart')) || [];)
-}
-
-function scrollToCart() {
-    const cartSection = document.getElementById('cart');
-    if (cartSection) cartSection.scrollIntoView({ behavior: 'smooth' });
-}
-
-function handleWhatsAppWelcome() {
-    if (!localStorage.getItem('paulCoffeeVisited')) {
-        localStorage.setItem('paulCoffeeVisited', 'true');
-        setTimeout(() => showNotification('👋 Welcome to Paul Coffee Shop!', 'info', 5000), 1200);
-    }
-}
-
-function setupHamburgerMenu() {
-    const hamburger = document.querySelector('.hamburger');
-    const navMenu = document.querySelector('.nav-menu');
-
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
-    }
+    if (hamburger && navMenu) hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
 }
 
 function showNotification(message, type = 'info', duration = 3000) {
