@@ -1,5 +1,8 @@
 let cart = JSON.parse(localStorage.getItem('paulCoffeeCart')) || [];
 const DEFAULT_MPESA_PHONE = '254794824443';
+const API_BASE_URL = window.location.hostname.includes('github.dev') || window.location.hostname.includes('app.github.dev')
+  ? 'http://localhost:3001'
+  : 'http://localhost:3001';
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeApp();
@@ -265,7 +268,7 @@ async function startOnlinePayment() {
   try {
     showNotification('⏳ Preparing payment...', 'info', 2000);
 
-    const response = await fetch('http://localhost:3001/api/create-payment-link', {
+    const response = await fetch(`${API_BASE_URL}/api/create-payment-link`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
