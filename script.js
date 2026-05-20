@@ -22,6 +22,7 @@ function setupGlobalEvents() {
     const whatsappBtn = e.target.closest('#send-order-btn');
     const payNowBtn = e.target.closest('#pay-now-btn');
     const cartLink = e.target.closest('.cart-link');
+    const hamburger = e.target.closest('.hamburger');
 
     if (addBtn) { e.preventDefault(); handleAddToCart(addBtn); return; }
     if (qtyBtn) { e.preventDefault(); handleQuantityAdjustment(qtyBtn); return; }
@@ -31,13 +32,16 @@ function setupGlobalEvents() {
     if (whatsappBtn) { e.preventDefault(); sendOrderToWhatsApp(); return; }
     if (payNowBtn) { e.preventDefault(); startOnlinePayment(); return; }
     if (cartLink) { e.preventDefault(); scrollToCart(); return; }
+    if (hamburger) { e.preventDefault(); setupHamburgerMenu(); return; }
   });
 
   document.addEventListener('change', (e) => {
     if (e.target.matches('.quantity-input')) handleQuantityInputChange(e.target);
     if (e.target.matches('.cart-qty-input')) handleCartQuantityInputChange(e.target);
     if (e.target.matches('#payment-method')) updatePaymentControls();
-    if (e.target.matches('#mpesa-phone')) localStorage.setItem('paulCoffeeMpesaPhone', e.target.value || DEFAULT_MPESA_PHONE);
+    if (e.target.matches('#mpesa-phone')) {
+      localStorage.setItem('paulCoffeeMpesaPhone', e.target.value || DEFAULT_MPESA_PHONE);
+    }
   });
 
   setupHamburgerMenu();
@@ -50,8 +54,10 @@ function handleAddToCart(btn) {
   const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
   const quantity = quantityInput ? Math.max(1, parseInt(quantityInput.value) || 1) : 1;
   const existingItem = cart.find(item => String(item.id) === String(itemId));
+
   if (existingItem) existingItem.quantity += quantity;
   else cart.push({ id: String(itemId), name: itemName, price: itemPrice, quantity });
+
   saveCart();
   syncCartWithUI();
   showNotification(`✅ ${itemName} added to cart`, 'success');
@@ -63,6 +69,7 @@ function handleQuantityAdjustment(btn) {
   const action = btn.dataset.action;
   const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
   if (!quantityInput) return;
+
   let value = parseInt(quantityInput.value) || 1;
   if (action === 'plus') value++;
   if (action === 'minus' && value > 1) value--;
@@ -79,8 +86,10 @@ function handleCartQuantityButton(btn) {
   const action = btn.dataset.action;
   const item = cart.find(i => String(i.id) === String(itemId));
   if (!item) return;
+
   if (action === 'plus') item.quantity++;
   if (action === 'minus' && item.quantity > 1) item.quantity--;
+
   saveCart();
   syncCartWithUI();
 }
@@ -89,6 +98,7 @@ function handleCartQuantityInputChange(input) {
   const itemId = input.dataset.id;
   const item = cart.find(i => String(i.id) === String(itemId));
   if (!item) return;
+
   item.quantity = Math.max(1, parseInt(input.value) || 1);
   saveCart();
   syncCartWithUI();
@@ -125,7 +135,13 @@ function updateCartDisplay() {
   if (!cartItemsList) return;
 
   if (cart.length === 0) {
-    cartItemsList.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-cart"></i><p>Your cart is empty</p><a href="#menu" class="btn btn-primary">Continue Shopping</a></div>`;
+    cartItemsList.innerHTML = `
+      <div class="empty-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <p>Your cart is empty</p>
+        <a href="#menu" class="btn btn-primary">Continue Shopping</a>
+      </div>
+    `;
     if (whatsappBtn) whatsappBtn.disabled = true;
     if (payNowBtn) payNowBtn.disabled = true;
     return;
@@ -133,7 +149,10 @@ function updateCartDisplay() {
 
   cartItemsList.innerHTML = cart.map(item => `
     <div class="cart-item" data-id="${item.id}">
-      <div class="cart-item-details"><h4>${item.name}</h4><p class="item-price">${item.price.toFixed(0)} KES</p></div>
+      <div class="cart-item-details">
+        <h4>${item.name}</h4>
+        <p class="item-price">${item.price.toFixed(0)} KES</p>
+      </div>
       <div class="cart-item-quantity">
         <button class="cart-qty-btn" data-id="${item.id}" data-action="minus">-</button>
         <input type="number" class="cart-qty-input" value="${item.quantity}" min="1" data-id="${item.id}">
@@ -166,12 +185,14 @@ function updateItemBadges() {
     const id = el.getAttribute('data-id');
     const item = cart.find(i => String(i.id) === String(id));
     let badge = el.querySelector('.added-badge');
+
     if (!badge) {
       badge = document.createElement('div');
       badge.className = 'added-badge';
       el.style.position = 'relative';
       el.appendChild(badge);
     }
+
     if (item) {
       badge.textContent = `In Cart: ${item.quantity}`;
       badge.style.display = 'block';
@@ -204,6 +225,7 @@ function updatePaymentControls() {
   const mpesaGroup = document.getElementById('mpesa-phone-group');
   const bankGroup = document.getElementById('bank-details-group');
   if (!paymentMethod) return;
+
   if (mpesaGroup) mpesaGroup.style.display = paymentMethod.value === 'mpesa' ? 'block' : 'none';
   if (bankGroup) bankGroup.style.display = paymentMethod.value === 'bank' ? 'block' : 'none';
 }
@@ -231,25 +253,45 @@ async function startOnlinePayment() {
     amount: subtotal,
     currency: 'KES',
     method: paymentMethod,
-    customer: { name: customerName, email: customerEmail, phone: customerPhone },
+    customer: {
+      name: customerName,
+      email: customerEmail,
+      phone: customerPhone
+    },
     items: cart,
     mpesaPhone
   };
 
-  console.log('Frontend payload:', payload);
-
   try {
     showNotification('⏳ Preparing payment...', 'info', 2000);
-    const response = await fetch('/api/create-payment-link', {
+
+    const response = await fetch('http://localhost:3001/api/create-payment-link', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json();
-    console.log('Frontend response:', data);
+    const contentType = response.headers.get('content-type') || '';
+    const rawText = await response.text();
+    console.log('Raw response:', rawText);
 
-    if (!response.ok || !data.success) throw new Error(data.message || `HTTP ${response.status}`);
+    if (!contentType.includes('application/json')) {
+      throw new Error('Server returned HTML instead of JSON');
+    }
+
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      throw new Error('Invalid JSON returned by server');
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || `HTTP ${response.status}`);
+    }
 
     if (data.paymentMode === 'mpesa' && data.stkResponse) {
       showNotification('📲 M-Pesa test response received.', 'success', 5000);
@@ -301,7 +343,9 @@ function handleWhatsAppWelcome() {
 function setupHamburgerMenu() {
   const hamburger = document.querySelector('.hamburger');
   const navMenu = document.querySelector('.nav-menu');
-  if (hamburger && navMenu) hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
+  if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
+  }
 }
 
 function showNotification(message, type = 'info', duration = 3000) {

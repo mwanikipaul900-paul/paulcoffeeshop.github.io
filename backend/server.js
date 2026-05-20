@@ -33,15 +33,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.post('/api/test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Backend is working',
-    received: req.body,
-    currency: 'KES'
-  });
-});
-
 app.post('/api/create-payment-link', (req, res) => {
   const payload = req.body || {};
   const orderId = payload.orderId || `ORD-${Date.now()}`;
