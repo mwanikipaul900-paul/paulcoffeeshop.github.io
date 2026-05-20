@@ -1,8 +1,6 @@
 let cart = JSON.parse(localStorage.getItem('paulCoffeeCart')) || [];
-const DEFAULT_MPESA_PHONE = '254794824443';
-const API_BASE_URL = window.location.hostname.includes('github.dev') || window.location.hostname.includes('app.github.dev')
-  ? 'http://localhost:3001'
-  : 'http://localhost:3001';
+const DEFAULT_MPESA_PHONE = '+254794824443';
+const API_BASE_URL = 'https://studious-guide-g4974wp9rw5j3vqpj-3001.app.github.dev';
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeApp();
