@@ -33,7 +33,12 @@ function setupGlobalEvents() {
     if (whatsappBtn) { e.preventDefault(); sendOrderToWhatsApp(); return; }
     if (payNowBtn) { e.preventDefault(); startOnlinePayment(); return; }
     if (cartLink) { e.preventDefault(); scrollToCart(); return; }
-    if (hamburger) { e.preventDefault(); setupHamburgerMenu(); return; }
+    if (hamburger) {
+      e.preventDefault();
+      const navMenu = document.querySelector('.nav-menu');
+      if (navMenu) navMenu.classList.toggle('active');
+      return;
+    }
   });
 
   document.addEventListener('change', (e) => {
@@ -44,8 +49,6 @@ function setupGlobalEvents() {
       localStorage.setItem('paulCoffeeMpesaPhone', e.target.value || DEFAULT_MPESA_PHONE);
     }
   });
-
-  setupHamburgerMenu();
 }
 
 function handleAddToCart(btn) {
@@ -338,14 +341,6 @@ function handleWhatsAppWelcome() {
   if (!localStorage.getItem('paulCoffeeVisited')) {
     localStorage.setItem('paulCoffeeVisited', 'true');
     setTimeout(() => showNotification('👋 Welcome to Paul Mwaniki Coffee Shop!', 'info', 5000), 1200);
-  }
-}
-
-function setupHamburgerMenu() {
-  const hamburger = document.querySelector('.hamburger');
-  const navMenu = document.querySelector('.nav-menu');
-  if (hamburger && navMenu) {
-    hamburger.addEventListener('click', () => navMenu.classList.toggle('active'));
   }
 }
 
