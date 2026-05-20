@@ -22,6 +22,7 @@ function setupGlobalEvents() {
     const whatsappBtn = e.target.closest('#send-order-btn');
     const payNowBtn = e.target.closest('#pay-now-btn');
     const cartLink = e.target.closest('.cart-link');
+
     if (addBtn) { e.preventDefault(); handleAddToCart(addBtn); return; }
     if (qtyBtn) { e.preventDefault(); handleQuantityAdjustment(qtyBtn); return; }
     if (cartQtyBtn) { e.preventDefault(); handleCartQuantityButton(cartQtyBtn); return; }
@@ -120,13 +121,16 @@ function updateCartDisplay() {
   const cartItemsList = document.getElementById('cart-items-list');
   const whatsappBtn = document.getElementById('send-order-btn');
   const payNowBtn = document.getElementById('pay-now-btn');
+
   if (!cartItemsList) return;
+
   if (cart.length === 0) {
     cartItemsList.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-cart"></i><p>Your cart is empty</p><a href="#menu" class="btn btn-primary">Continue Shopping</a></div>`;
     if (whatsappBtn) whatsappBtn.disabled = true;
     if (payNowBtn) payNowBtn.disabled = true;
     return;
   }
+
   cartItemsList.innerHTML = cart.map(item => `
     <div class="cart-item" data-id="${item.id}">
       <div class="cart-item-details"><h4>${item.name}</h4><p class="item-price">${item.price.toFixed(0)} KES</p></div>
@@ -139,6 +143,7 @@ function updateCartDisplay() {
       <button class="btn-remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button>
     </div>
   `).join('');
+
   if (whatsappBtn) whatsappBtn.disabled = false;
   if (payNowBtn) payNowBtn.disabled = false;
 }
@@ -208,15 +213,18 @@ async function startOnlinePayment() {
     showNotification('⚠️ Your cart is empty', 'warning');
     return;
   }
+
   const customerName = document.getElementById('customer-name')?.value.trim();
   const customerEmail = document.getElementById('customer-email')?.value.trim();
   const customerPhone = document.getElementById('customer-phone')?.value.trim();
   const paymentMethod = document.getElementById('payment-method')?.value || 'visa';
   const mpesaPhone = document.getElementById('mpesa-phone')?.value.trim() || DEFAULT_MPESA_PHONE;
+
   if (!customerName || !customerEmail || !customerPhone) {
     showNotification('⚠️ Please fill customer name, email, and phone', 'warning');
     return;
   }
+
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const payload = {
     orderId: 'ORD-' + Date.now(),
@@ -227,7 +235,9 @@ async function startOnlinePayment() {
     items: cart,
     mpesaPhone
   };
+
   console.log('Frontend payload:', payload);
+
   try {
     showNotification('⏳ Preparing payment...', 'info', 2000);
     const response = await fetch('/api/create-payment-link', {
@@ -235,21 +245,29 @@ async function startOnlinePayment() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const text = await response.text();
-    console.log('Raw response text:', text);
-    const data = JSON.parse(text);
+
+    const data = await response.json();
     console.log('Frontend response:', data);
-    if (!response.ok || !data.success) throw new Error(data.message || 'Payment request failed');
+
+    if (!response.ok || !data.success) throw new Error(data.message || `HTTP ${response.status}`);
+
     if (data.paymentMode === 'mpesa' && data.stkResponse) {
       showNotification('📲 M-Pesa test response received.', 'success', 5000);
       console.log('STK response:', data.stkResponse);
       return;
     }
+
     if (data.paymentMode === 'bank' && data.bankDetails) {
       showNotification('🏦 Bank details loaded successfully.', 'success', 5000);
       console.log('Bank details:', data.bankDetails);
       return;
     }
+
+    if (data.paymentUrl) {
+      window.location.href = data.paymentUrl;
+      return;
+    }
+
     showNotification('✅ Test payment route returned JSON successfully.', 'success', 5000);
   } catch (error) {
     console.error('Payment error:', error);
