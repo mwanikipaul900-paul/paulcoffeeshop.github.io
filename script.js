@@ -34,7 +34,8 @@ function setupGlobalEvents() {
 
     document.addEventListener('change', (e) => {
         if (e.target.matches('.quantity-input')) handleQuantityInputChange(e.target);
-        if (e.target.matches('#payment-method')) setupPaymentControls();
+        if (e.target.matches('.cart-qty-input')) handleCartQuantityInputChange(e.target);
+        if (e.target.matches('#payment-method')) updatePaymentControls();
         if (e.target.matches('#mpesa-phone')) localStorage.setItem('paulCoffeeMpesaPhone', e.target.value || '');
     });
 
@@ -94,6 +95,18 @@ function handleCartQuantityButton(btn) {
     syncCartWithUI();
 }
 
+function handleCartQuantityInputChange(input) {
+    const itemId = input.dataset.id;
+    const item = cart.find(i => String(i.id) === String(itemId));
+    if (!item) return;
+
+    const value = Math.max(1, parseInt(input.value) || 1);
+    item.quantity = value;
+
+    saveCart();
+    syncCartWithUI();
+}
+
 function handleRemoveCartItem(btn) {
     const itemId = btn.dataset.id;
     cart = cart.filter(item => String(item.id) !== String(itemId));
@@ -108,6 +121,7 @@ function syncCartWithUI() {
     updateOrderSummary();
     updatePayButtonState();
     updateItemBadges();
+    updatePaymentControls();
 }
 
 function updateCartCount() {
@@ -212,22 +226,22 @@ function clearCart() {
 }
 
 function setupPaymentControls() {
+    updatePaymentControls();
+
+    const mpesaPhone = document.getElementById('mpesa-phone');
+    const storedPhone = localStorage.getItem('paulCoffeeMpesaPhone');
+    if (mpesaPhone && storedPhone && !mpesaPhone.value) mpesaPhone.value = storedPhone;
+}
+
+function updatePaymentControls() {
     const paymentMethod = document.getElementById('payment-method');
     const mpesaGroup = document.getElementById('mpesa-phone-group');
     const bankGroup = document.getElementById('bank-details-group');
-    const mpesaPhone = document.getElementById('mpesa-phone');
-    const storedPhone = localStorage.getItem('paulCoffeeMpesaPhone');
 
-    if (mpesaPhone && storedPhone) mpesaPhone.value = storedPhone;
     if (!paymentMethod) return;
 
-    const updateVisibility = () => {
-        if (mpesaGroup) mpesaGroup.style.display = paymentMethod.value === 'mpesa' ? 'block' : 'none';
-        if (bankGroup) bankGroup.style.display = paymentMethod.value === 'bank' ? 'block' : 'none';
-    };
-
-    updateVisibility();
-    paymentMethod.addEventListener('change', updateVisibility);
+    if (mpesaGroup) mpesaGroup.style.display = paymentMethod.value === 'mpesa' ? 'block' : 'none';
+    if (bankGroup) bankGroup.style.display = paymentMethod.value === 'bank' ? 'block' : 'none';
 }
 
 async function startOnlinePayment() {
@@ -260,6 +274,8 @@ async function startOnlinePayment() {
         mpesaPhone: mpesaPhone ? mpesaPhone.value : ''
     };
 
+    console.log('Frontend payload:', payload);
+
     try {
         showNotification('⏳ Preparing payment...', 'info', 2000);
 
@@ -271,6 +287,8 @@ async function startOnlinePayment() {
 
         const data = await response.json();
 
+        console.log('Frontend response:', data);
+
         if (!response.ok) throw new Error(data.message || `HTTP ${response.status}`);
 
         if (data.paymentUrl) {
@@ -280,11 +298,13 @@ async function startOnlinePayment() {
 
         if (data.paymentMode === 'bank' && data.bankDetails) {
             showNotification('🏦 Bank details loaded in checkout.', 'success', 5000);
+            console.log('Bank details:', data.bankDetails);
             return;
         }
 
         if (data.paymentMode === 'mpesa') {
             showNotification('📲 M-Pesa payment request prepared.', 'success', 5000);
+            console.log('STK response:', data.stkResponse);
             return;
         }
 
