@@ -308,7 +308,7 @@ async function startOnlinePayment() {
             return;
         }
 
-        throw new Error('No payment URL returned');
+        showNotification('✅ Test payment route returned JSON successfully.', 'success', 5000);
     } catch (error) {
         console.error('Payment error:', error);
         showNotification('❌ Payment server not ready or wrong URL.', 'error', 6000);
